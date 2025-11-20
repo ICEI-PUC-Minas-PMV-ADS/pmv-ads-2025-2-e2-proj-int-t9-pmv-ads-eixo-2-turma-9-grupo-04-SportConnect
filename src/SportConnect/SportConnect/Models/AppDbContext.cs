@@ -15,5 +15,31 @@ namespace SportConnect.Models
 
         public DbSet<Participacao> Participacoes { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Grupo>()
+                .HasOne(g => g.Usuario)
+                .WithMany(u => u.Grupos)
+                .HasForeignKey(g => g.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Evento → Grupo
+            modelBuilder.Entity<Evento>()
+                .HasOne(e => e.Grupo)
+                .WithMany(u => u.Eventos)
+                .HasForeignKey(e => e.GrupoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Evento → Criador (Usuario)
+            modelBuilder.Entity<Evento>()
+                .HasOne(e => e.Criador)
+                .WithMany(u => u.EventosCriados)
+                .HasForeignKey(e => e.CriadorId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
+
+    

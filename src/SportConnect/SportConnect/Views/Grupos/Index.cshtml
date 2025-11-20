@@ -54,16 +54,19 @@
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Editar</a>
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Visualizar</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-custom">Excluir Grupo</a>
+                        <a href="@Url.Action("Index", "Eventos", new{grupoId=@item.Id})" class="btn btn-primary btn-custom">Eventos</a>
                     }
                     else
                     {
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Visualizar</a>
+                           
 
                         var gruposLotados = ViewBag.GruposLotados as HashSet<int>;
                         var lotado = gruposLotados != null && gruposLotados.Contains(item.Id);
 
                         @if (jaParticipa)
                         {
+                                <a href="@Url.Action("Index", "Eventos", new { grupoId = @item.Id })" class="btn btn-primary btn-custom">Eventos</a>
                             @* ✅ Usuário já inscrito: mostra "Participando" (verde), Visualizar e Sair *@
                             <button type="button" class="btn btn-success btn-custom" disabled>Participando</button>
 
