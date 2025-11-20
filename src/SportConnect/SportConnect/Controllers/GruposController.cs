@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SportConnect.Models;
-using System.Security.Claims;                     
+using System.Security.Claims;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace CriarGrupo.Controllers
 {
@@ -372,7 +375,143 @@ namespace CriarGrupo.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> GerenciarParticipantes(int? id)
+        {
+            if (id == null) return NotFound();
 
+            var grupo = await _context.Grupos.FindAsync(id.Value);
+            if (grupo == null) return NotFound();
+
+            var userId = GetCurrentUserId();
+            if (userId == null || grupo.UsuarioId != userId.Value)
+            {
+                return Forbid();
+            }
+
+            var participantesIds = await _context.Participacoes
+                .Where(p => p.GrupoId == id && p.StatusParticipacao == "Inscrito")
+                .Select(p => p.UsuarioId)
+                .ToListAsync();
+
+            var participantes = await _context.Usuarios
+                .Where(u => participantesIds.Contains(u.Id))
+                .ToListAsync();
+
+            ViewBag.Participantes = participantes;
+
+            return View(grupo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoverParticipante(int grupoId, int usuarioId)
+        {
+            var loggedInUserId = GetCurrentUserId();
+            if (loggedInUserId == null) return Challenge();
+
+            var grupo = await _context.Grupos.FindAsync(grupoId);
+            if (grupo == null) return NotFound();
+
+            if (grupo.UsuarioId != loggedInUserId.Value)
+            {
+                return Forbid();
+            }
+
+            var participacao = await _context.Participacoes
+                .FirstOrDefaultAsync(p => p.GrupoId == grupoId && p.UsuarioId == usuarioId);
+
+            if (participacao != null)
+            {
+                _context.Participacoes.Remove(participacao);
+                await _context.SaveChangesAsync();
+                TempData["Sucesso"] = "Participante removido com sucesso!";
+            }
+            else
+            {
+                TempData["Erro"] = "Participante não encontrado.";
+            }
+
+            return RedirectToAction("GerenciarParticipantes", new { id = grupoId });
+        }
+        public async Task<IActionResult> BaixarRelatorioPDF(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var grupo = await _context.Grupos.FindAsync(id.Value);
+            if (grupo == null) return NotFound();
+
+            var userId = GetCurrentUserId();
+            if (userId == null || grupo.UsuarioId != userId.Value)
+            {
+                return Forbid();
+            }
+
+            var participantesIds = await _context.Participacoes
+                .Where(p => p.GrupoId == id && p.StatusParticipacao == "Inscrito")
+                .Select(p => p.UsuarioId)
+                .ToListAsync();
+
+            var participantes = await _context.Usuarios
+                .Where(u => participantesIds.Contains(u.Id))
+                .ToListAsync();
+
+            var relatorio = new RelatorioParticipantesPDF(grupo, participantes);
+
+            byte[] pdfBytes = relatorio.GeneratePdf();
+
+            string nomeArquivo = $"Relatorio_Participantes_{grupo.Nome.Replace(" ", "_")}.pdf";
+
+            return File(pdfBytes, "application/pdf", nomeArquivo);
+        }
 
     }
 }
+
+    public class RelatorioParticipantesPDF : IDocument
+    {
+        private readonly Grupo _grupo;
+        private readonly List<Usuario> _participantes;
+
+        public RelatorioParticipantesPDF(Grupo grupo, List<Usuario> participantes)
+        {
+            _grupo = grupo;
+            _participantes = participantes;
+        }
+
+        public void Compose(IDocumentContainer container)
+        {
+            container
+                .Page(page =>
+                {
+                    page.Margin(50);
+                    page.Size(PageSizes.A4);
+
+                    page.Header()
+                        .Text($"Relatório de Participantes: {_grupo.Nome}")
+                        .SemiBold().FontSize(20);
+
+                    page.Content()
+                        .PaddingVertical(1, Unit.Centimetre)
+                        .Column(col =>
+                        {
+                            col.Spacing(5);
+
+                            col.Item().Text("Nome").Bold();
+
+                            foreach (var user in _participantes)
+                            {
+                                col.Item().Text(user.Nome);
+                                col.Item().LineHorizontal(0.5f);
+                            }
+                        });
+
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(x =>
+                        {
+                            x.Span("Página ");
+                            x.CurrentPageNumber();
+                        });
+                });
+        }
+    }

@@ -151,7 +151,7 @@ namespace SportConnect.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Detalhes(int id)
+        public async Task<IActionResult> Detalhes(int? id)
         {
             if(id == null)
             {
@@ -261,7 +261,7 @@ namespace SportConnect.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Editar(int id)
+        public async Task<IActionResult> Editar(int? id)
         {
             if(id == null)
             {
@@ -302,7 +302,7 @@ namespace SportConnect.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Excluir(int id)
+        public async Task<IActionResult> Excluir(int? id)
         {
             if(id == null)
             {
