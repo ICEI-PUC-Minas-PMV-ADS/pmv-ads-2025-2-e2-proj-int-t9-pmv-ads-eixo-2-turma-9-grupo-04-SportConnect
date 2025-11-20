@@ -32,19 +32,19 @@ namespace SportConnect.Models
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
 
-        [Display(Name = "Criado por (Id do Usuário)")]
-        public int? UsuarioId { get; set; }   // tipo compatível com Usuario.Id (int)
+        
+        
+        // FK do Grupo
 
-        // 🔹 Navegação (opcional)
-        [ForeignKey(nameof(UsuarioId))]
-        public Grupo? Usuario { get; set; }
+        public int GrupoId { get; set; }
 
-        [Display(Name = "Criado por (Id do Grupo)")]
-        public int? GrupoId { get; set; }   // tipo compatível com Usuario.Id (int)
+        public Grupo Grupo { get; set; }
 
-        // 🔹 Navegação (opcional)
-        [ForeignKey(nameof(GrupoId))]
-        public Grupo? Grupo { get; set; }
+
+        // FK do Criador do Evento
+        public int CriadorId { get; set; }
+
+        public Usuario Criador { get; set; }
 
 
     }

@@ -42,6 +42,8 @@ namespace CriarGrupo.Models
         [ForeignKey(nameof(UsuarioId))]
         public Usuario? Usuario { get; set; }
 
+        public ICollection<Evento> Eventos { get; set; } = new List<Evento>();
+
 
 
     }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CriarGrupo.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
@@ -33,5 +34,8 @@ namespace SportConnect.Models
         [Required(ErrorMessage = "Obrigatório informar a senha!")]
         [DataType(DataType.Password)]
         public string Senha { get; set; }
+
+        public ICollection<Grupo> Grupos { get; set; } = new List<Grupo>();
+        public ICollection<Evento> EventosCriados { get; set; } = new List<Evento>();
     }
 }
