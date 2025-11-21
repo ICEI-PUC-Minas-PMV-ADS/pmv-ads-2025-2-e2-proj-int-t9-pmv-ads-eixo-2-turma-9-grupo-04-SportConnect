@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SportConnect.Models;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -29,27 +28,11 @@ namespace SportConnect.Controllers
         // LISTA EVENTOS DO GRUPO
         public async Task<IActionResult> Index(int grupoId)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return Challenge();
-
-            var grupo = await _context.Grupos.FindAsync(grupoId);
-            if (grupo == null) return NotFound();
-
-            bool isCreator = grupo.UsuarioId == userId;
-            bool isParticipant = await _context.Participacoes
-                .AnyAsync(p => p.GrupoId == grupoId && p.UsuarioId == userId && p.StatusParticipacao == "Inscrito");
-
-            if (!isCreator && !isParticipant)
-            {
-                return Forbid();
-            }
             var eventos = await _context.Eventos
                 .Where(e => e.GrupoId == grupoId)
                 .ToListAsync();
 
             ViewBag.GrupoId = grupoId;
-
-            ViewBag.CriadorDoGrupoId = grupo.UsuarioId;
 
             return View("Eventos", eventos);
         }
