@@ -10,7 +10,7 @@ using SportConnect.Services;
 namespace CriarGrupo.Controllers
 {
     [Authorize]
-    
+    public class GruposAdminController : Controller 
     {
         private const string StatusInscrito = "Inscrito";
         private const string StatusCancelado = "Cancelado";
@@ -19,7 +19,7 @@ namespace CriarGrupo.Controllers
         private readonly AppDbContext _context;
         private readonly IListaEsperaService _filaService;
 
-        public GruposController(AppDbContext context, IListaEsperaService filaService)
+        public GruposAdminController(AppDbContext context, IListaEsperaService filaService)
         {
             _context = context;
             _filaService = filaService;
@@ -35,10 +35,10 @@ namespace CriarGrupo.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            // 1) Carrega os grupos
+            
             var dados = await _context.Grupos.AsNoTracking().ToListAsync();
 
-            // 2) Carrega "meus grupos" (em que o usuário está INSCRITO)
+            
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (int.TryParse(idClaim, out var uid))
             {
@@ -54,7 +54,7 @@ namespace CriarGrupo.Controllers
                 ViewBag.MeusGrupos = new HashSet<int>();
             }
 
-            // 2b) carrega "meus grupos em FILA" (Lista de Espera)
+            
             if (int.TryParse(idClaim, out uid))
             {
                 var meusEmFila = await _context.Participacoes
@@ -69,20 +69,20 @@ namespace CriarGrupo.Controllers
                 ViewBag.MeusGruposFila = new HashSet<int>();
             }
 
-            // 3) Quantidade de participantes ATIVOS (Status = "Inscrito") por grupo
+                
             var ativosPorGrupo = await _context.Participacoes
                 .Where(p => p.StatusParticipacao == StatusInscrito)
                 .GroupBy(p => p.GrupoId)
                 .Select(g => new { GrupoId = g.Key, Qtde = g.Count() })
                 .ToListAsync();
 
-            // Mapa: GrupoId -> Qtde de inscritos
+                
             var mapaQtde = ativosPorGrupo.ToDictionary(x => x.GrupoId, x => x.Qtde);
 
-            // Disponibiliza o mapa para a view (caso queira exibir contadores depois)
+            
             ViewBag.ParticipantesAtivos = mapaQtde;
 
-            // 4) Quais grupos estão LOTADOS (qtde >= NumeroMaximoParticipantes e limite > 0)
+           
             var gruposLotados = new HashSet<int>((
                 dados.Where(g =>
                     g.NumeroMaximoParticipantes > 0
@@ -256,7 +256,7 @@ namespace CriarGrupo.Controllers
             var uidStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
-
+                
             var part = await _context.Participacoes
                 .FirstOrDefaultAsync(p => p.GrupoId == id
                                        && p.UsuarioId == uid

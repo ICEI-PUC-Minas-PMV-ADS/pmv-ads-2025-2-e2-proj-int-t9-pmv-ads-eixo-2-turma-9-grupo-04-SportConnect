@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SportConnect\Controllers
+namespace SportConnectControllers
 {
     [Authorize]
     public class GruposController : Controller

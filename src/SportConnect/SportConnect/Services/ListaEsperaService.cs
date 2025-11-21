@@ -1,8 +1,9 @@
+#nullable enable
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SportConnect.Hubs;
 using SportConnect.Models;
+using SportConnect.Hubs;
 using System;
 using System.Data;
 using System.Linq;
@@ -11,33 +12,23 @@ using System.Threading.Tasks;
 
 namespace SportConnect.Services
 {
-    public interface IListaEsperaService
-    {
-        Task EnqueueAsync(int grupoId, int usuarioId, CancellationToken ct = default);
-        Task<bool> RemoveAndPromoteNextAsync(int grupoId, int usuarioId, CancellationToken ct = default);
-        Task PromoteNextIfVagaAsync(int grupoId, CancellationToken ct = default);
-    }
-
     public class ListaEsperaService : IListaEsperaService
     {
         private readonly AppDbContext _db;
-        private readonly IHubContext<ListaEsperaHub> _hub;
+        private readonly IHubContext<ListaEsperaHub>? _hub;
         private readonly ILogger<ListaEsperaService> _logger;
 
         private const string StatusInscrito = "Inscrito";
         private const string StatusFila = "Lista de Espera";
         private const string StatusCancelado = "Cancelado";
 
-        public ListaEsperaService(AppDbContext db, IHubContext<ListaEsperaHub> hub, ILogger<ListaEsperaService> logger)
+        public ListaEsperaService(AppDbContext db, IHubContext<ListaEsperaHub>? hub, ILogger<ListaEsperaService> logger)
         {
-            _db = db;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
             _hub = hub;
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Coloca o usuário na lista de espera do grupo (cria ou atualiza participação).
-        /// </summary>
         public async Task EnqueueAsync(int grupoId, int usuarioId, CancellationToken ct = default)
         {
             var part = await _db.Participacoes
@@ -58,20 +49,17 @@ namespace SportConnect.Services
             {
                 if (part.StatusParticipacao == StatusInscrito)
                 {
-                    // já inscrito — nada a fazer
                     _logger.LogDebug("Usuario {UsuarioId} já inscrito no grupo {GrupoId}", usuarioId, grupoId);
                     return;
                 }
 
                 if (part.StatusParticipacao == StatusFila)
                 {
-                    // já na fila — atualiza timestamp para manter ordem desejada ou opcionalmente manter original
                     part.DataInscricao = DateTimeOffset.UtcNow;
                     _db.Participacoes.Update(part);
                 }
                 else
                 {
-                    // reentrar na fila
                     part.StatusParticipacao = StatusFila;
                     part.DataInscricao = DateTimeOffset.UtcNow;
                     _db.Participacoes.Update(part);
@@ -82,13 +70,8 @@ namespace SportConnect.Services
             _logger.LogInformation("Usuario {UsuarioId} entrou na fila do grupo {GrupoId}", usuarioId, grupoId);
         }
 
-        /// <summary>
-        /// Remove o usuário inscrito (desistência) e, na mesma transação, promove o próximo da fila se houver vaga.
-        /// Retorna true se alguém foi promovido.
-        /// </summary>
         public async Task<bool> RemoveAndPromoteNextAsync(int grupoId, int usuarioId, CancellationToken ct = default)
         {
-            // Transação com isolamento forte para reduzir race conditions
             using var tx = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
             try
             {
@@ -102,12 +85,10 @@ namespace SportConnect.Services
                     return false;
                 }
 
-                // marca como cancelado
                 part.StatusParticipacao = StatusCancelado;
                 _db.Participacoes.Update(part);
                 await _db.SaveChangesAsync(ct);
 
-                // recalcula ocupação
                 var inscritos = await _db.Participacoes
                     .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusInscrito)
                     .CountAsync(ct);
@@ -116,7 +97,6 @@ namespace SportConnect.Services
 
                 if (grupo != null && (grupo.NumeroMaximoParticipantes == 0 || inscritos < grupo.NumeroMaximoParticipantes))
                 {
-                    // encontra próximo da fila
                     var proximo = await _db.Participacoes
                         .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusFila)
                         .OrderBy(p => p.DataInscricao)
@@ -130,11 +110,13 @@ namespace SportConnect.Services
 
                         await tx.CommitAsync(ct);
 
-                        // notifica usuário promovido (não bloqueante)
                         try
                         {
-                            await _hub.Clients.User(proximo.UsuarioId.ToString())
-                                .SendAsync("Promovido", new { GrupoId = grupoId, ParticipacaoId = proximo.Id }, ct);
+                            if (_hub != null)
+                            {
+                                await _hub.Clients.User(proximo.UsuarioId.ToString())
+                                    .SendAsync("Promovido", new { GrupoId = grupoId, ParticipacaoId = proximo.Id }, ct);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -157,9 +139,6 @@ namespace SportConnect.Services
             }
         }
 
-        /// <summary>
-        /// Promove o próximo da fila para inscrito se houver vaga (usa para background service).
-        /// </summary>
         public async Task PromoteNextIfVagaAsync(int grupoId, CancellationToken ct = default)
         {
             using var tx = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
@@ -180,7 +159,7 @@ namespace SportConnect.Services
                 if (grupo.NumeroMaximoParticipantes > 0 && inscritos >= grupo.NumeroMaximoParticipantes)
                 {
                     await tx.RollbackAsync(ct);
-                    return; // sem vaga
+                    return;
                 }
 
                 var proximo = await _db.Participacoes
@@ -201,8 +180,11 @@ namespace SportConnect.Services
 
                 try
                 {
-                    await _hub.Clients.User(proximo.UsuarioId.ToString())
-                        .SendAsync("Promovido", new { GrupoId = grupoId, ParticipacaoId = proximo.Id }, ct);
+                    if (_hub != null)
+                    {
+                        await _hub.Clients.User(proximo.UsuarioId.ToString())
+                            .SendAsync("Promovido", new { GrupoId = grupoId, ParticipacaoId = proximo.Id }, ct);
+                    }
                 }
                 catch (Exception ex)
                 {
