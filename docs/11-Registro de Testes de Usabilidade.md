@@ -75,6 +75,16 @@ O registro de testes de usabilidade é um documento ou planilha onde são coleta
 | Usuário 4   |        72 seg    |              11                   |      Sim           |     Nenhum                   |         "Achei a interface simples, sem muitas coisas complicadas"                   |                     | 
 | Usuário 5   |         145 seg  |              15                   |       Sim          |      Nenhum, apenas demorou para preencher os dados    |    "Achei difícil porque precisava escrever tudo, não tem jeito mais rápido"     |                     | 
 
+**Cenário 7**:  Edição do grupos criados    
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        40 seg    |              7                   |     Sim            |       Nenhum                 |          "Foram editadas três informações de forma prática e intuitiva".   |                     |      
+| Usuário 2   |        18 seg    |             4                    |        Sim         |        Nenhum                |            "Editei o campo Cidade. Não tive dificuldade".               |                     |      
+| Usuário 3   |        34 seg   |       6           |        Sim         |          Nenhum   |  "Conclui a edição sem erros"                 |                     |  
+| Usuário 4   |        25 seg    |              3                   |      Sim           |     Nenhum                   |         "Editei uma informação na descrição do grupo. Muito fácil!"                   |                     | 
+| Usuário 5   |         27 seg  |              3                   |       Sim          |      Nenhum    |    "Mudei o nome do grupo e salvei sem problemas".     |                     | 
+
+
 ## Relatório dos testes de usabilidade 
 
 ### Objetivo:
