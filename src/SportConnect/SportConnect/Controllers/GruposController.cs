@@ -7,10 +7,10 @@ using System.Security.Claims;
 using System.Data;
 using SportConnect.Services;
 
-namespace CriarGrupo.Controllers
+namespace SportConnect.Controllers
 {
     [Authorize]
-    public class GruposAdminController : Controller 
+    public class GruposController : Controller
     {
         private const string StatusInscrito = "Inscrito";
         private const string StatusCancelado = "Cancelado";
@@ -19,7 +19,7 @@ namespace CriarGrupo.Controllers
         private readonly AppDbContext _context;
         private readonly IListaEsperaService _filaService;
 
-        public GruposAdminController(AppDbContext context, IListaEsperaService filaService)
+        public GruposController(AppDbContext context, IListaEsperaService filaService)
         {
             _context = context;
             _filaService = filaService;
@@ -35,10 +35,8 @@ namespace CriarGrupo.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            
             var dados = await _context.Grupos.AsNoTracking().ToListAsync();
 
-            
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (int.TryParse(idClaim, out var uid))
             {
@@ -54,7 +52,6 @@ namespace CriarGrupo.Controllers
                 ViewBag.MeusGrupos = new HashSet<int>();
             }
 
-            
             if (int.TryParse(idClaim, out uid))
             {
                 var meusEmFila = await _context.Participacoes
@@ -69,28 +66,23 @@ namespace CriarGrupo.Controllers
                 ViewBag.MeusGruposFila = new HashSet<int>();
             }
 
-                
             var ativosPorGrupo = await _context.Participacoes
                 .Where(p => p.StatusParticipacao == StatusInscrito)
                 .GroupBy(p => p.GrupoId)
                 .Select(g => new { GrupoId = g.Key, Qtde = g.Count() })
                 .ToListAsync();
 
-                
             var mapaQtde = ativosPorGrupo.ToDictionary(x => x.GrupoId, x => x.Qtde);
-
-            
             ViewBag.ParticipantesAtivos = mapaQtde;
 
-           
-            var gruposLotados = new HashSet<int>((
+            var gruposLotados = new HashSet<int>(
                 dados.Where(g =>
                     g.NumeroMaximoParticipantes > 0
                     && mapaQtde.TryGetValue(g.Id, out var q)
                     && q >= g.NumeroMaximoParticipantes
                 )
                 .Select(g => g.Id)
-            ));
+            );
 
             ViewBag.GruposLotados = gruposLotados;
 
@@ -160,7 +152,7 @@ namespace CriarGrupo.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-            [AllowAnonymous]
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -203,7 +195,6 @@ namespace CriarGrupo.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Participar(int id, bool? waitlist)
@@ -218,10 +209,9 @@ namespace CriarGrupo.Controllers
             var grupo = await _context.Grupos.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
             if (grupo == null) return NotFound();
 
-         
             await _filaService.EnqueueAsync(id, uid);
 
-            TempData["ok"] = "Você entrou na lista de espera.";
+            TempData["ok"] = "Voc� entrou na lista de espera.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -239,9 +229,9 @@ namespace CriarGrupo.Controllers
             var promoted = await _filaService.RemoveAndPromoteNextAsync(id, uid);
 
             if (promoted)
-                TempData["ok"] = "Você saiu do grupo. O próximo da fila foi inscrito.";
+                TempData["ok"] = "Voc� saiu do grupo. O pr�ximo da fila foi inscrito.";
             else
-                TempData["ok"] = "Você saiu do grupo.";
+                TempData["ok"] = "Voc� saiu do grupo.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -256,7 +246,7 @@ namespace CriarGrupo.Controllers
             var uidStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
-                
+
             var part = await _context.Participacoes
                 .FirstOrDefaultAsync(p => p.GrupoId == id
                                        && p.UsuarioId == uid
@@ -266,7 +256,7 @@ namespace CriarGrupo.Controllers
             {
                 part.StatusParticipacao = StatusCancelado;
                 await _context.SaveChangesAsync();
-                TempData["ok"] = "Você saiu da lista de espera.";
+                TempData["ok"] = "Voc� saiu da lista de espera.";
             }
 
             return RedirectToAction(nameof(Index));
