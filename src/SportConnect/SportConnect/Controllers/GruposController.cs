@@ -177,6 +177,8 @@ namespace CriarGrupo.Controllers
             var dados = await _context.Grupos.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
             if (dados == null) return NotFound();
 
+            ViewBag.CurrentUserId = GetCurrentUserId();
+
             return View(dados);
         }
 

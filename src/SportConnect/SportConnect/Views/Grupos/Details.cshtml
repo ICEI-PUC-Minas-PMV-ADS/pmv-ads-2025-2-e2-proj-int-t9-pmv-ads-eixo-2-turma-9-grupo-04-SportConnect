@@ -2,6 +2,12 @@
 
 @{
     ViewData["Title"] = "Details";
+
+    var uid = ViewBag.CurrentUserId as int?;
+
+    var criadorId = Model.UsuarioId;
+
+    var podeGerenciar = uid.HasValue && uid.Value == criadorId;
 }
 
 <h1>Informações do Grupo</h1>
@@ -22,8 +28,11 @@
             </div>
 
             <div class="card-footer bg-white border-0 d-flex justify-content-center gap-3">
-               
                 <a asp-action="Index" class="btn btn-danger btn-custom">Voltar</a>
+            @if (podeGerenciar)
+            {
+                <a asp-action="GerenciarParticipantes" asp-route-id="@Model.Id" class="btn btn-primary btn-custom">Participantes</a>
+            } 
             </div>
         </div>
     </div>
