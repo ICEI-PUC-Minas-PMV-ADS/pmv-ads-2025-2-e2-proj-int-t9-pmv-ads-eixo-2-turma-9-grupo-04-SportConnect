@@ -206,12 +206,74 @@ namespace SportConnect.Controllers
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
 
-            var grupo = await _context.Grupos.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+            var grupo = await _context.Grupos.FirstOrDefaultAsync(g => g.Id == id);
             if (grupo == null) return NotFound();
 
-            await _filaService.EnqueueAsync(id, uid);
+            
+            var existente = await _context.Participacoes
+                .FirstOrDefaultAsync(p => p.GrupoId == id && p.UsuarioId == uid && p.StatusParticipacao != StatusCancelado);
 
-            TempData["ok"] = "Voc� entrou na lista de espera.";
+            if (existente != null)
+            {
+                var mensagemExistente = "Você já está inscrito ou na lista de espera deste grupo.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = false, mensagem = mensagemExistente, grupoId = id });
+                TempData["ok"] = mensagemExistente;
+                return RedirectToAction(nameof(Index));
+            }
+
+            
+            var ativos = await _context.Participacoes
+                .CountAsync(p => p.GrupoId == id && p.StatusParticipacao == StatusInscrito);
+
+            
+            if (grupo.NumeroMaximoParticipantes == 0 || ativos < grupo.NumeroMaximoParticipantes)
+            {
+                var part = new Participacao
+                {
+                    UsuarioId = uid,
+                    GrupoId = id,
+                    StatusParticipacao = StatusInscrito,
+                    DataInscricao = DateTimeOffset.UtcNow
+                };
+                _context.Participacoes.Add(part);
+                await _context.SaveChangesAsync();
+
+                var msg = "Você foi inscrito no grupo.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = true, status = StatusInscrito, mensagem = msg, grupoId = id, inscritos = ativos + 1 });
+                TempData["ok"] = msg;
+                return RedirectToAction(nameof(Index));
+            }
+
+            
+            if (grupo.ListaEspera)
+            {
+                var part = new Participacao
+                {
+                    UsuarioId = uid,
+                    GrupoId = id,
+                    StatusParticipacao = StatusFila,
+                    DataInscricao = DateTimeOffset.UtcNow
+                };
+                _context.Participacoes.Add(part);
+                await _context.SaveChangesAsync();
+
+                
+                await _filaService.EnqueueAsync(id, uid);
+
+                var msg = "Você entrou na lista de espera.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = true, status = StatusFila, mensagem = msg, grupoId = id, inscritos = ativos });
+                TempData["ok"] = msg;
+                return RedirectToAction(nameof(Index));
+            }
+
+            // grupo lotado e sem lista
+            var semLista = "Grupo lotado e sem opção de lista de espera.";
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return Json(new { success = false, mensagem = semLista, grupoId = id });
+            TempData["ok"] = semLista;
             return RedirectToAction(nameof(Index));
         }
 
@@ -229,16 +291,16 @@ namespace SportConnect.Controllers
             var promoted = await _filaService.RemoveAndPromoteNextAsync(id, uid);
 
             if (promoted)
-                TempData["ok"] = "Voc� saiu do grupo. O pr�ximo da fila foi inscrito.";
+                TempData["ok"] = "Você saiu do grupo. O próximo da fila foi inscrito.";
             else
-                TempData["ok"] = "Voc� saiu do grupo.";
+                TempData["ok"] = "Você saiu do grupo.";
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SairDaFila(int id) // id = GrupoId
+        public async Task<IActionResult> SairDaFila(int id) 
         {
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Login", "Usuarios");
@@ -256,7 +318,7 @@ namespace SportConnect.Controllers
             {
                 part.StatusParticipacao = StatusCancelado;
                 await _context.SaveChangesAsync();
-                TempData["ok"] = "Voc� saiu da lista de espera.";
+                TempData["ok"] = "Você saiu da lista de espera.";
             }
 
             return RedirectToAction(nameof(Index));

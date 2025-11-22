@@ -59,15 +59,13 @@
                     else
                     {
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Visualizar</a>
-                           
 
                         var gruposLotados = ViewBag.GruposLotados as HashSet<int>;
                         var lotado = gruposLotados != null && gruposLotados.Contains(item.Id);
 
                         @if (jaParticipa)
                         {
-                                <a href="@Url.Action("Index", "Eventos", new { grupoId = @item.Id })" class="btn btn-primary btn-custom">Eventos</a>
-                           
+                            @* ✅ Usuário já inscrito: mostra "Participando" (verde), Visualizar e Sair *@
                             <button type="button" class="btn btn-success btn-custom" disabled>Participando</button>
 
                             <form asp-action="Sair" asp-route-id="@item.Id" method="post" class="d-inline">
@@ -77,7 +75,7 @@
                         }
                         else if (lotado)
                         {
-                            
+                            @* Grupo lotado *@
                             @if (item.ListaEspera)
                             {
                                 var meusGruposFila = ViewBag.MeusGruposFila as HashSet<int>;
@@ -85,7 +83,7 @@
 
                                 if (estaNaFila)
                                 {
-                                  
+                                    @* ✅ Já está na fila: mostra botão para sair *@
                                     <form asp-action="SairDaFila" asp-route-id="@item.Id" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn btn-danger btn-custom">Sair da lista de espera</button>
@@ -93,7 +91,7 @@
                                 }
                                 else
                                 {
-                                    
+                                    @* 🔸 Ainda não está na fila: pode entrar *@
                                     <form asp-action="Participar" asp-route-id="@item.Id" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="waitlist" value="true" />
@@ -103,13 +101,13 @@
                             }
                             else
                             {
-                              
+                                @* Lotado e sem fila *@
                                 <button type="button" class="btn btn-secondary btn-custom" disabled>Grupo lotado</button>
                             }
                         }
-
                         else
                         {
+                            @* Ainda há vagas: participar normalmente *@
                             <form asp-action="Participar" asp-route-id="@item.Id" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-primary btn-custom">Participar</button>
@@ -145,10 +143,10 @@
         color: #fff;
     }
 
-        .btn-primary:hover {
-            background-color: #0069d9 !important;
-            border-color: #0062cc !important;
-        }
+    .btn-primary:hover {
+        background-color: #0069d9 !important;
+        border-color: #0062cc !important;
+    }
 
     .btn-success {
         background-color: #28a745 !important;
@@ -203,17 +201,14 @@
 
     /* Em telas pequenas (≤ 576px): empilha e deixa os botões com largura cheia */
     @@media (max-width: 576px) {
-        .card-footer
+        .card-footer {
+            flex-direction: column;
+            align-items: stretch; /* os botões ocupam toda a largura do card */
+            gap: 8px; /* espaço vertical entre eles */
+        }
 
-    {
-        flex-direction: column;
-        align-items: stretch; /* os botões ocupam toda a largura do card */
-        gap: 8px; /* espaço vertical entre eles */
-    }
-
-    .card-footer .btn {
-        width: 100%;
-    }
-
+        .card-footer .btn {
+            width: 100%;
+        }
     }
 </style>
