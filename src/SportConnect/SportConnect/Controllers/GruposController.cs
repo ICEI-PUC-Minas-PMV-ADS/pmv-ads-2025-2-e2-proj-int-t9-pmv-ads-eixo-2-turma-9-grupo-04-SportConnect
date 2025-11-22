@@ -422,9 +422,9 @@ namespace SportConnect.Controllers
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
 
-            var promoted = await _filaService.RemoveAndPromoteNextAsync(id, uid);
+            bool? promotedUserId = await _filaService.RemoveAndPromoteNextAsync(id, uid);
 
-            if (promoted)
+            if (promotedUserId.HasValue && promotedUserId.Value)
                 TempData["ok"] = "Você saiu do grupo. O próximo da fila foi inscrito.";
             else
                 TempData["ok"] = "Você saiu do grupo.";
