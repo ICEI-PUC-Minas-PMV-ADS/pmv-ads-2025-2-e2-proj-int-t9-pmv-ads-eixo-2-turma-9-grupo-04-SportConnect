@@ -1,11 +1,18 @@
 ﻿using CriarGrupo.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using SportConnect.Migrations;
 using SportConnect.Models;
 using System.Security.Claims;
 using System.Data;
 using SportConnect.Services;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace SportConnect.Controllers
 {
@@ -71,7 +78,7 @@ namespace SportConnect.Controllers
                 .GroupBy(p => p.GrupoId)
                 .Select(g => new { GrupoId = g.Key, Qtde = g.Count() })
                 .ToListAsync();
-
+                
             var mapaQtde = ativosPorGrupo.ToDictionary(x => x.GrupoId, x => x.Qtde);
             ViewBag.ParticipantesAtivos = mapaQtde;
 
@@ -86,12 +93,127 @@ namespace SportConnect.Controllers
 
             ViewBag.GruposLotados = gruposLotados;
 
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(g => g.Nome).ToListAsync();
+
+            items.Add(new SelectListItem { Text = "Pesquisar modalidade", Value = "", Selected = true, Disabled = true });
+            items.Add(new SelectListItem { Text = "Nenhuma", Value = "Nenhuma"});
+
+            foreach (var modalidade in modalidades)
+            {
+                items.Add(new SelectListItem { Text = $"{modalidade}", Value = $"{modalidade}" });
+            }
+
+            ViewBag.Modalidades = items;
+
+            foreach (var dado in dados)
+            {
+                switch (dado.Estado)
+                {
+                    case "AC":
+                        dado.Estado = "Acre";
+                        break;
+                    case "AL":
+                        dado.Estado = "Alagoas";
+                        break;
+                    case "AP":
+                        dado.Estado = "Amapá";
+                        break;
+                    case "AM":
+                        dado.Estado = "Amazonas";
+                        break;
+                    case "BA":
+                        dado.Estado = "Bahia";
+                        break;
+                    case "CE":
+                        dado.Estado = "Ceará";
+                        break;
+                    case "DF":
+                        dado.Estado = "Distrito Federal";
+                        break;
+                    case "ES":
+                        dado.Estado = "Espírito Santo";
+                        break;
+                    case "GO":
+                        dado.Estado = "Goiás";
+                        break;
+                    case "MA":
+                        dado.Estado = "Maranhão";
+                        break;
+                    case "MT":
+                        dado.Estado = "Mato Grosso";
+                        break;
+                    case "MS":
+                        dado.Estado = "Mato Grosso do Sul";
+                        break;
+                    case "MG":
+                        dado.Estado = "Minas Gerais";
+                        break;
+                    case "PA":
+                        dado.Estado = "Pará";
+                        break;
+                    case "PB":
+                        dado.Estado = "Paraíba";
+                        break;
+                    case "PR":
+                        dado.Estado = "Paraná";
+                        break;
+                    case "PE":
+                        dado.Estado = "Pernambuco";
+                        break;
+                    case "PI":
+                        dado.Estado = "Piauí";
+                        break;
+                    case "RJ":
+                        dado.Estado = "Rio de Janeiro";
+                        break;
+                    case "RN":
+                        dado.Estado = "Rio Grande do Norte";
+                        break;
+                    case "RS":
+                        dado.Estado = "Rio Grande do Sul";
+                        break;
+                    case "RO":
+                        dado.Estado = "Rondônia";
+                        break;
+                    case "RR":
+                        dado.Estado = "Roraima";
+                        break;
+                    case "SC":
+                        dado.Estado = "Santa Catarina";
+                        break;
+                    case "SP":
+                        dado.Estado = "São Paulo";
+                        break;
+                    case "SE":
+                        dado.Estado = "Sergipe";
+                        break;
+                    case "TO":
+                        dado.Estado = "Tocantins";
+                        break;
+                }
+            }
+
+            ViewBag.Espera = null;
+
             return View(dados);
         }
 
-        [AllowAnonymous]
-        public IActionResult Create()
+        [AllowAnonymous] 
+        public async Task<IActionResult> Create()
         {
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(g => g.Nome).ToListAsync();
+
+            items.Add(new SelectListItem { Text = "Procurar modalidade", Value = "", Selected = true, Disabled = true });
+
+            foreach (var modalidade in modalidades)
+            {
+                items.Add(new SelectListItem { Text = $"{modalidade}", Value = $"{modalidade}" });
+            }
+
+            ViewBag.Modalidades = items;
+
             return View();
         }
 
@@ -121,6 +243,23 @@ namespace SportConnect.Controllers
             var userId = GetCurrentUserId();
             if (userId == null) return Challenge();
             if (grupo.UsuarioId != userId) return Forbid();
+
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(g => g.Nome).ToListAsync();
+
+            if (!modalidades.Contains(grupo.Modalidade))
+            {
+                items.Add(new SelectListItem { Text = grupo.Modalidade.ToString(), Value = grupo.Modalidade.ToString(), Selected = true });
+            }
+
+            foreach (var modalidadeItem in modalidades)
+            {
+                if(modalidadeItem == grupo.Modalidade.ToString()) items.Add(new SelectListItem { Text = $"{modalidadeItem}", Value = $"{modalidadeItem}", Selected = true });
+                
+                else items.Add(new SelectListItem { Text = $"{modalidadeItem}", Value = $"{modalidadeItem}" });
+            }
+
+            ViewBag.Modalidades = items;
 
             return View(grupo);
         }
@@ -308,7 +447,7 @@ namespace SportConnect.Controllers
             var uidStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
-
+                
             var part = await _context.Participacoes
                 .FirstOrDefaultAsync(p => p.GrupoId == id
                                        && p.UsuarioId == uid
@@ -322,6 +461,242 @@ namespace SportConnect.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Filtro(string nome, string estado, string cidade, string modalidade, string espera, string gruposDono, string gruposParticipo)
+        {
+            bool? boolean = null;
+            List<Grupo> dados = [];
+            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (nome == "") nome = null;
+
+            if (estado == "Selecione um estado" || estado == "Nenhum") estado = null;
+
+            if (cidade == "Selecione uma cidade" || cidade == "Nenhuma") cidade = null;
+
+            if (modalidade == "" || modalidade == "Nenhuma") modalidade = null;
+
+            if (espera == "Tem lista de espera" || espera == "Nenhum") espera = null;
+
+            else
+            {
+                if (espera == "Sim") boolean = true;
+
+                else boolean = false;
+            }
+
+            if(gruposParticipo == null && gruposDono == null)
+            {
+                dados = await _context.Grupos
+                .Where(g =>
+                    (espera != null ? g.ListaEspera == boolean : true) &&
+                    (estado != null ? g.Estado == estado : true) &&
+                    (cidade != null ? g.Cidade == cidade : true) &&
+                    (modalidade != null ? g.Modalidade == modalidade : true) &&
+                    (nome != null ? g.Nome == nome : true)
+                )
+                .ToListAsync();
+            }
+            else if (gruposDono != null)
+            {
+                dados = await _context.Grupos
+                    .Where(g => 
+                        (g.UsuarioId == int.Parse(idClaim)) &&
+                        (espera != null ? g.ListaEspera == boolean : true) &&
+                        (estado != null ? g.Estado == estado : true) &&
+                        (cidade != null ? g.Cidade == cidade : true) &&
+                        (modalidade != null ? g.Modalidade == modalidade : true) &&
+                        (nome != null ? g.Nome == nome : true)
+                    )
+                    .ToListAsync();
+            }
+            else
+            {
+                var gruposId = await _context.Participacoes
+                    .Where(g => g.UsuarioId == int.Parse(idClaim) && g.StatusParticipacao == "Inscrito")
+                    .Select(g => g.GrupoId)
+                    .ToListAsync();
+
+                foreach (var grupoId in gruposId)
+                {
+                    var grupo = await _context.Grupos
+                        .Where(g =>
+                            (g.Id == grupoId) &&
+                            (espera != null ? g.ListaEspera == boolean : true) &&
+                            (estado != null ? g.Estado == estado : true) &&
+                            (cidade != null ? g.Cidade == cidade : true) &&
+                            (modalidade != null ? g.Modalidade == modalidade : true) &&
+                            (nome != null ? g.Nome == nome : true)
+                        ).FirstOrDefaultAsync();
+
+                    if(grupo != null) dados.Add(grupo);
+                }
+            }
+
+            if (int.TryParse(idClaim, out var uid))
+            {
+                var meus = await _context.Participacoes
+                    .Where(p => p.UsuarioId == uid && p.StatusParticipacao == StatusInscrito)
+                    .Select(p => p.GrupoId)
+                    .ToListAsync();
+
+                ViewBag.MeusGrupos = new HashSet<int>(meus);
+            }
+            else
+            {
+                ViewBag.MeusGrupos = new HashSet<int>();
+            }
+
+            if (int.TryParse(idClaim, out uid))
+            {
+                var meusEmFila = await _context.Participacoes
+                    .Where(p => p.UsuarioId == uid && p.StatusParticipacao == "Lista de Espera")
+                    .Select(p => p.GrupoId)
+                    .ToListAsync();
+
+                ViewBag.MeusGruposFila = new HashSet<int>(meusEmFila);
+            }
+            else
+            {
+                ViewBag.MeusGruposFila = new HashSet<int>();
+            }
+
+            var ativosPorGrupo = await _context.Participacoes
+                .Where(p => p.StatusParticipacao == StatusInscrito)
+                .GroupBy(p => p.GrupoId)
+                .Select(g => new { GrupoId = g.Key, Qtde = g.Count() })
+                .ToListAsync();
+
+            var mapaQtde = ativosPorGrupo.ToDictionary(x => x.GrupoId, x => x.Qtde);
+
+            ViewBag.ParticipantesAtivos = mapaQtde;
+
+            var gruposLotados = new HashSet<int>(
+                dados.Where(g =>
+                    g.NumeroMaximoParticipantes > 0
+                    && mapaQtde.TryGetValue(g.Id, out var q)
+                    && q >= g.NumeroMaximoParticipantes
+                )
+                .Select(g => g.Id)
+            );
+
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(g => g.Nome).ToListAsync();
+
+            items.Add(new SelectListItem { Text = "Pesquisar modalidade", Value = "", Selected = true, Disabled = true });
+            items.Add(new SelectListItem { Text = "Nenhuma", Value = "Nenhuma" });
+
+            foreach (var modalidadeItem in modalidades)
+            {
+                items.Add(new SelectListItem { Text = $"{modalidadeItem}", Value = $"{modalidadeItem}" });
+            }
+
+            ViewBag.Modalidades = items;
+
+            if (!modalidades.Contains(modalidade) && modalidade != null) ViewBag.Text = "Sim";
+
+            ViewBag.GruposLotados = gruposLotados;
+
+            ViewBag.Estado = estado;
+            ViewBag.Nome = nome;
+            ViewBag.Modalidade = modalidade;
+            ViewBag.Espera = espera;
+            ViewBag.Cidade = cidade;
+            ViewBag.GruposParticipo = gruposParticipo;
+            ViewBag.GruposDono = gruposDono;
+
+            foreach (var dado in dados)
+            {
+                switch (dado.Estado)
+                {
+                    case "AC":
+                        dado.Estado = "Acre";
+                        break;
+                    case "AL":
+                        dado.Estado = "Alagoas";
+                        break;
+                    case "AP":
+                        dado.Estado = "Amapá";
+                        break;
+                    case "AM":
+                        dado.Estado = "Amazonas";
+                        break;
+                    case "BA":
+                        dado.Estado = "Bahia";
+                        break;
+                    case "CE":
+                        dado.Estado = "Ceará";
+                        break;
+                    case "DF":
+                        dado.Estado = "Distrito Federal";
+                        break;
+                    case "ES":
+                        dado.Estado = "Espírito Santo";
+                        break;
+                    case "GO":
+                        dado.Estado = "Goiás";
+                        break;
+                    case "MA":
+                        dado.Estado = "Maranhão";
+                        break;
+                    case "MT":
+                        dado.Estado = "Mato Grosso";
+                        break;
+                    case "MS":
+                        dado.Estado = "Mato Grosso do Sul";
+                        break;
+                    case "MG":
+                        dado.Estado = "Minas Gerais";
+                        break;
+                    case "PA":
+                        dado.Estado = "Pará";
+                        break;
+                    case "PB":
+                        dado.Estado = "Paraíba";
+                        break;
+                    case "PR":
+                        dado.Estado = "Paraná";
+                        break;
+                    case "PE":
+                        dado.Estado = "Pernambuco";
+                        break;
+                    case "PI":
+                        dado.Estado = "Piauí";
+                        break;
+                    case "RJ":
+                        dado.Estado = "Rio de Janeiro";
+                        break;
+                    case "RN":
+                        dado.Estado = "Rio Grande do Norte";
+                        break;
+                    case "RS":
+                        dado.Estado = "Rio Grande do Sul";
+                        break;
+                    case "RO":
+                        dado.Estado = "Rondônia";
+                        break;
+                    case "RR":
+                        dado.Estado = "Roraima";
+                        break;
+                    case "SC":
+                        dado.Estado = "Santa Catarina";
+                        break;
+                    case "SP":
+                        dado.Estado = "São Paulo";
+                        break;
+                    case "SE":
+                        dado.Estado = "Sergipe";
+                        break;
+                    case "TO":
+                        dado.Estado = "Tocantins";
+                        break;
+                }
+            }
+
+            return View("~/Views/Grupos/Index.cshtml", dados);
         }
     }
 }

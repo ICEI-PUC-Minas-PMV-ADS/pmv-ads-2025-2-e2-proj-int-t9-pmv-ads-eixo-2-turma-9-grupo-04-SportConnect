@@ -105,7 +105,7 @@
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            @if ((controller == "Grupos" && action == "Index" && !User.Identity.IsAuthenticated) || controller == "Home" || (controller == "Usuarios" && (action == "Login" || action == "Cadastrar" || action == "AlterarSenha" || action == "ConfirmarSenha" || action == "Sucesso")))
+                            @if ((controller == "Grupos" && (action == "Index" || action == "Filtro") && !User.Identity.IsAuthenticated) || controller == "Home" || (controller == "Usuarios" && (action == "Login" || action == "Cadastrar" || action == "AlterarSenha" || action == "ConfirmarSenha" || action == "Sucesso")))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>

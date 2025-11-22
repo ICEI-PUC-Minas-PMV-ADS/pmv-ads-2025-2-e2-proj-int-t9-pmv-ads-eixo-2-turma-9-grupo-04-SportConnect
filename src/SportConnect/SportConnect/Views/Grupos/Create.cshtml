@@ -38,11 +38,17 @@
                 </select>
                 <span asp-validation-for="ListaEspera" class="text-danger"></span>
             </div>
-                     
+            
             <div class="form-group">
-                <label asp-for="Modalidade" class="control-label"></label>
-                <input asp-for="Modalidade" class="form-control" />
-                <span asp-validation-for="Modalidade" class="text-danger"></span>
+                <label for="modalidade" class="control-label">Modalidade</label>
+
+                <div id="modalidade-section">
+                    @Html.DropDownList("modalidade", (IEnumerable<SelectListItem>)ViewBag.Modalidades, new { @class = "form-control", style = "border-radius: 12px; padding: 6px 12px 6px 12px;" })
+                    <p id="changeText" onclick="changeInput(event)" style="color: #007bff; cursor: pointer">Não encontrou?</p>
+                    <span asp-validation-for="Modalidade" class="text-danger"></span>
+                </div>
+                
+                <input asp-for="Modalidade" class="form-control visually-hidden" />
             </div>
 
             <div class="form-group">
@@ -120,7 +126,9 @@
         margin-left: 50px;
     }
 
-   
+    #changeText{
+        margin-bottom: 0px !important; 
+    }
 </style>
 
 
@@ -165,4 +173,83 @@
         cidade.disabled = true;
       }
     };
+
+    const changeInput = (e) => {
+        const section = document.getElementById("modalidade-section")
+        var htmlContent = ""
+
+        if(e.target.id == "changeText"){
+            htmlContent = `
+                <input class="form-control" placeholder="Inserir modalidade" name="modalidade" id="modalidade" style="border-radius: 12px; padding: 4px 12px 6px 12px; height: 38px" type="text" />
+                <p id="changeSelect" onclick="changeInput(event)" style="color: #007bff; cursor: pointer">Voltar</p>
+            `
+            section.innerHTML = htmlContent
+        }
+        else{
+            htmlContent = `
+                <select class="form-control" id="modalidade" name="modalidade" style="border-radius: 12px; padding: 6px 12px 6px 12px;">
+                    <option selected hidden disabled>Procurar modalidade</option>
+                    <option>Futebol</option>
+                    <option>Vôlei</option>
+                    <option>Futsal</option>
+                    <option>Basquete</option>
+                    <option>Natação</option>
+                    <option>Caminhada e Corrida</option>
+                    <option>Ciclismo</option>
+                    <option>Tênis de Mesa</option>
+                    <option>Musculação</option>
+                    <option>Surf</option>
+                    <option>Skate</option>
+                    <option>Judô</option>
+                    <option>Jiu-Jitsu</option>
+                    <option>Boxe</option>
+                    <option>Capoeira</option>
+                    <option>Handebol</option>
+                    <option>Vôlei de Praia</option>
+                    <option>Futevôlei</option>
+                    <option>Tênis</option>
+                    <option>Atletismo</option>
+                    <option>Ginástica Artística</option>
+                    <option>Ginástica Rítmica</option>
+                    <option>Taekwondo</option>
+                    <option>Karatê</option>
+                    <option>Mountain Bike</option>
+                    <option>Canoagem</option>
+                    <option>Remo</option>
+                    <option>Polo Aquático</option>
+                    <option>Halterofilismo</option>
+                    <option>Golfe</option>
+                    <option>Beisebol</option>
+                    <option>Softbol</option>
+                    <option>Futebol Americano</option>
+                    <option>Rugby</option>
+                    <option>Esgrima</option>
+                    <option>Tiro Esportivo</option>
+                    <option>Hipismo</option>
+                    <option>Badminton</option>
+                    <option>Squash</option>
+                    <option>Peteca</option>
+                    <option>Beach Tennis</option>
+                    <option>Padel</option>
+                    <option>Pesca Esportiva</option>
+                    <option>Triatlo</option>
+                    <option>Muay Thai</option>
+                    <option>Iatismo</option>
+                    <option>Automobilismo</option>
+                    <option>Motociclismo</option>
+                    <option>Breakdance</option>
+                    <option>Xadrez</option>
+                </select>
+
+                <p id="changeText" onclick="changeInput(event)" style="color: #007bff; cursor: pointer">Não encontrou?</p>
+            `
+            section.innerHTML = htmlContent
+        }
+    }
+
+
+    document.getElementById("modalidade").addEventListener("change" || "input", () => {
+        const modalidade = document.getElementById("modalidade").value
+        document.getElementById("Modalidade").value = modalidade
+    })
 </script>
