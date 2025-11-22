@@ -1,29 +1,37 @@
-﻿using CriarGrupo.Models;
-using Microsoft.AspNetCore.Authorization;        
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SportConnect.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using CriarGrupo.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using SportConnect.Models;
+using SportConnect.Services;
 
-namespace CriarGrupo.Controllers
+namespace SportConnect.Controllers
 {
-    [Authorize] 
+    [Authorize]
     public class GruposController : Controller
     {
         private const string StatusInscrito = "Inscrito";
         private const string StatusCancelado = "Cancelado";
+        private const string StatusFila = "Lista de Espera";
 
         private readonly AppDbContext _context;
+        private readonly IListaEsperaService _filaService;
 
-        public GruposController(AppDbContext context)
+        public GruposController(AppDbContext context, IListaEsperaService filaService)
         {
             _context = context;
+            _filaService = filaService;
         }
 
-        
         private int? GetCurrentUserId()
         {
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -34,10 +42,8 @@ namespace CriarGrupo.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            // 1) Carrega os grupos
             var dados = await _context.Grupos.AsNoTracking().ToListAsync();
 
-            // 2) Carrega "meus grupos" (em que o usuário está INSCRITO)
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (int.TryParse(idClaim, out var uid))
             {
@@ -53,12 +59,10 @@ namespace CriarGrupo.Controllers
                 ViewBag.MeusGrupos = new HashSet<int>();
             }
 
-            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            // 2b) NOVO BLOCO: carrega "meus grupos em FILA" (Lista de Espera)
             if (int.TryParse(idClaim, out uid))
             {
                 var meusEmFila = await _context.Participacoes
-                    .Where(p => p.UsuarioId == uid && p.StatusParticipacao == "Lista de Espera")
+                    .Where(p => p.UsuarioId == uid && p.StatusParticipacao == StatusFila)
                     .Select(p => p.GrupoId)
                     .ToListAsync();
 
@@ -68,22 +72,16 @@ namespace CriarGrupo.Controllers
             {
                 ViewBag.MeusGruposFila = new HashSet<int>();
             }
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            // 3) Quantidade de participantes ATIVOS (Status = "Inscrito") por grupo
             var ativosPorGrupo = await _context.Participacoes
                 .Where(p => p.StatusParticipacao == StatusInscrito)
                 .GroupBy(p => p.GrupoId)
                 .Select(g => new { GrupoId = g.Key, Qtde = g.Count() })
                 .ToListAsync();
 
-            // Mapa: GrupoId -> Qtde de inscritos
             var mapaQtde = ativosPorGrupo.ToDictionary(x => x.GrupoId, x => x.Qtde);
-
-            // Disponibiliza o mapa para a view (caso queira exibir contadores depois)
             ViewBag.ParticipantesAtivos = mapaQtde;
 
-            // 4) Quais grupos estão LOTADOS (qtde >= NumeroMaximoParticipantes e limite > 0)
             var gruposLotados = new HashSet<int>(
                 dados.Where(g =>
                     g.NumeroMaximoParticipantes > 0
@@ -95,16 +93,127 @@ namespace CriarGrupo.Controllers
 
             ViewBag.GruposLotados = gruposLotados;
 
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(m => m.Nome).ToListAsync();
+
+            items.Add(new SelectListItem { Text = "Pesquisar modalidade", Value = "", Selected = true, Disabled = true });
+            items.Add(new SelectListItem { Text = "Nenhuma", Value = "Nenhuma" });
+
+            foreach (var modalidade in modalidades)
+            {
+                items.Add(new SelectListItem { Text = modalidade, Value = modalidade });
+            }
+
+            ViewBag.Modalidades = items;
+
+            foreach (var dado in dados)
+            {
+                switch (dado.Estado)
+                {
+                    case "AC":
+                        dado.Estado = "Acre";
+                        break;
+                    case "AL":
+                        dado.Estado = "Alagoas";
+                        break;
+                    case "AP":
+                        dado.Estado = "Amapá";
+                        break;
+                    case "AM":
+                        dado.Estado = "Amazonas";
+                        break;
+                    case "BA":
+                        dado.Estado = "Bahia";
+                        break;
+                    case "CE":
+                        dado.Estado = "Ceará";
+                        break;
+                    case "DF":
+                        dado.Estado = "Distrito Federal";
+                        break;
+                    case "ES":
+                        dado.Estado = "Espírito Santo";
+                        break;
+                    case "GO":
+                        dado.Estado = "Goiás";
+                        break;
+                    case "MA":
+                        dado.Estado = "Maranhão";
+                        break;
+                    case "MT":
+                        dado.Estado = "Mato Grosso";
+                        break;
+                    case "MS":
+                        dado.Estado = "Mato Grosso do Sul";
+                        break;
+                    case "MG":
+                        dado.Estado = "Minas Gerais";
+                        break;
+                    case "PA":
+                        dado.Estado = "Pará";
+                        break;
+                    case "PB":
+                        dado.Estado = "Paraíba";
+                        break;
+                    case "PR":
+                        dado.Estado = "Paraná";
+                        break;
+                    case "PE":
+                        dado.Estado = "Pernambuco";
+                        break;
+                    case "PI":
+                        dado.Estado = "Piauí";
+                        break;
+                    case "RJ":
+                        dado.Estado = "Rio de Janeiro";
+                        break;
+                    case "RN":
+                        dado.Estado = "Rio Grande do Norte";
+                        break;
+                    case "RS":
+                        dado.Estado = "Rio Grande do Sul";
+                        break;
+                    case "RO":
+                        dado.Estado = "Rondônia";
+                        break;
+                    case "RR":
+                        dado.Estado = "Roraima";
+                        break;
+                    case "SC":
+                        dado.Estado = "Santa Catarina";
+                        break;
+                    case "SP":
+                        dado.Estado = "São Paulo";
+                        break;
+                    case "SE":
+                        dado.Estado = "Sergipe";
+                        break;
+                    case "TO":
+                        dado.Estado = "Tocantins";
+                        break;
+                }
+            }
+
+            ViewBag.Espera = null;
+
             return View(dados);
         }
 
-
-
-
-
-        [AllowAnonymous] 
-        public IActionResult Create()
+        [AllowAnonymous]
+        public async Task<IActionResult> Create()
         {
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(m => m.Nome).ToListAsync();
+
+            items.Add(new SelectListItem { Text = "Procurar modalidade", Value = "", Selected = true, Disabled = true });
+
+            foreach (var modalidade in modalidades)
+            {
+                items.Add(new SelectListItem { Text = modalidade, Value = modalidade });
+            }
+
+            ViewBag.Modalidades = items;
+
             return View();
         }
 
@@ -115,9 +224,8 @@ namespace CriarGrupo.Controllers
             if (!ModelState.IsValid) return View(grupo);
 
             var userId = GetCurrentUserId();
-            if (userId == null) return Challenge(); 
+            if (userId == null) return Challenge();
 
-            
             grupo.UsuarioId = userId;
 
             _context.Grupos.Add(grupo);
@@ -132,10 +240,25 @@ namespace CriarGrupo.Controllers
             var grupo = await _context.Grupos.FindAsync(id);
             if (grupo == null) return NotFound();
 
-            
             var userId = GetCurrentUserId();
             if (userId == null) return Challenge();
             if (grupo.UsuarioId != userId) return Forbid();
+
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidades = await _context.Modalidades.Select(m => m.Nome).ToListAsync();
+
+            if (!string.IsNullOrEmpty(grupo.Modalidade) && !modalidades.Contains(grupo.Modalidade))
+            {
+                items.Add(new SelectListItem { Text = grupo.Modalidade, Value = grupo.Modalidade, Selected = true });
+            }
+
+            foreach (var modalidadeItem in modalidades)
+            {
+                if (modalidadeItem == grupo.Modalidade) items.Add(new SelectListItem { Text = modalidadeItem, Value = modalidadeItem, Selected = true });
+                else items.Add(new SelectListItem { Text = modalidadeItem, Value = modalidadeItem });
+            }
+
+            ViewBag.Modalidades = items;
 
             return View(grupo);
         }
@@ -149,14 +272,12 @@ namespace CriarGrupo.Controllers
             var original = await _context.Grupos.FindAsync(id);
             if (original == null) return NotFound();
 
-            
             var userId = GetCurrentUserId();
             if (userId == null) return Challenge();
             if (original.UsuarioId != userId) return Forbid();
 
             if (!ModelState.IsValid) return View(original);
 
-           
             original.Nome = grupo.Nome;
             original.Descricao = grupo.Descricao;
             original.NumeroMaximoParticipantes = grupo.NumeroMaximoParticipantes;
@@ -169,7 +290,7 @@ namespace CriarGrupo.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [AllowAnonymous] 
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -214,10 +335,9 @@ namespace CriarGrupo.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Participar(int id, bool? waitlist) // waitlist vem da View quando grupo está lotado
+        public async Task<IActionResult> Participar(int id, bool? waitlist)
         {
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Login", "Usuarios");
@@ -226,132 +346,74 @@ namespace CriarGrupo.Controllers
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
 
-            // 1) Verifica se o grupo existe
-            var grupo = await _context.Grupos.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+            var grupo = await _context.Grupos.FirstOrDefaultAsync(g => g.Id == id);
             if (grupo == null) return NotFound();
 
-            // 2) Calcula lotação atual (apenas "Inscrito")
-            var inscritos = await _context.Participacoes
-                .CountAsync(p => p.GrupoId == id && p.StatusParticipacao == StatusInscrito);
+            var existente = await _context.Participacoes
+                .FirstOrDefaultAsync(p => p.GrupoId == id && p.UsuarioId == uid && p.StatusParticipacao != StatusCancelado);
 
-            var temLimite = grupo.NumeroMaximoParticipantes > 0;
-            var lotado = temLimite && inscritos >= grupo.NumeroMaximoParticipantes;
-
-            // 3) Busca participação existente do usuário (pode reativar/alternar status)
-            var part = await _context.Participacoes
-                .FirstOrDefaultAsync(p => p.GrupoId == id && p.UsuarioId == uid);
-
-            // 4) Se está lotado...
-            if (lotado)
+            if (existente != null)
             {
-                // ... e o grupo NÃO aceita lista de espera
-                if (!grupo.ListaEspera)
-                {
-                    TempData["ok"] = "Grupo lotado. Lista de espera não disponível.";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // ... aceita lista de espera. Só entra na fila se a View pedir explicitamente
-                var querFila = waitlist == true;
-
-                if (!querFila)
-                {
-                    // veio sem a intenção de fila — só informa
-                    TempData["ok"] = "Grupo lotado. Você pode entrar na lista de espera.";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // aqui: usuário quer entrar na lista de espera
-                if (part == null)
-                {
-                    part = new Participacao
-                    {
-                        GrupoId = id,
-                        UsuarioId = uid,
-                        StatusParticipacao = "Lista de Espera"
-                    };
-                    _context.Participacoes.Add(part);
-                    TempData["ok"] = "Você entrou na lista de espera.";
-                }
-                else
-                {
-                    // Se já existe, atualiza para fila
-                    if (part.StatusParticipacao != "Lista de Espera")
-                    {
-                        part.StatusParticipacao = "Lista de Espera";
-                        TempData["ok"] = "Você entrou na lista de espera.";
-                    }
-                    else
-                    {
-                        TempData["ok"] = "Você já está na lista de espera.";
-                    }
-                }
-
-                await _context.SaveChangesAsync();
+                var mensagemExistente = "Você já está inscrito ou na lista de espera deste grupo.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = false, mensagem = mensagemExistente, grupoId = id });
+                TempData["ok"] = mensagemExistente;
                 return RedirectToAction(nameof(Index));
             }
 
-            // 5) Não está lotado => INSCRITO
-            if (part == null)
+            var ativos = await _context.Participacoes
+                .CountAsync(p => p.GrupoId == id && p.StatusParticipacao == StatusInscrito);
+
+            if (grupo.NumeroMaximoParticipantes == 0 || ativos < grupo.NumeroMaximoParticipantes)
             {
-                part = new Participacao
+                var part = new Participacao
                 {
-                    GrupoId = id,
                     UsuarioId = uid,
-                    StatusParticipacao = StatusInscrito
+                    GrupoId = id,
+                    StatusParticipacao = StatusInscrito,
+                    DataInscricao = DateTimeOffset.UtcNow
                 };
                 _context.Participacoes.Add(part);
-                TempData["ok"] = "Inscrição realizada!";
-            }
-            else
-            {
-                if (part.StatusParticipacao != StatusInscrito)
-                {
-                    part.StatusParticipacao = StatusInscrito; // reativa ou tira da fila
-                    TempData["ok"] = "Inscrição realizada!";
-                }
-                else
-                {
-                    TempData["ok"] = "Você já está inscrito neste grupo.";
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Sair(int id) // id = GrupoId
-        {
-            if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Login", "Usuarios");
-
-            var uidStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(uidStr, out var uid))
-                return Forbid();
-
-            // procura uma participação ATIVA (Inscrito) do usuário nesse grupo
-            var part = await _context.Participacoes
-                .FirstOrDefaultAsync(p => p.GrupoId == id
-                                       && p.UsuarioId == uid
-                                       && p.StatusParticipacao == StatusInscrito);
-
-            if (part != null)
-            {
-                // Soft delete: apenas muda o status
-                part.StatusParticipacao = StatusCancelado;
                 await _context.SaveChangesAsync();
-                TempData["ok"] = "Você saiu do grupo.";
+
+                var msg = "Você foi inscrito no grupo.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = true, status = StatusInscrito, mensagem = msg, grupoId = id, inscritos = ativos + 1 });
+                TempData["ok"] = msg;
+                return RedirectToAction(nameof(Index));
             }
 
+            if (grupo.ListaEspera)
+            {
+                var part = new Participacao
+                {
+                    UsuarioId = uid,
+                    GrupoId = id,
+                    StatusParticipacao = StatusFila,
+                    DataInscricao = DateTimeOffset.UtcNow
+                };
+                _context.Participacoes.Add(part);
+                await _context.SaveChangesAsync();
+
+                await _filaService.EnqueueAsync(id, uid);
+
+                var msg = "Você entrou na lista de espera.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = true, status = StatusFila, mensagem = msg, grupoId = id, inscritos = ativos });
+                TempData["ok"] = msg;
+                return RedirectToAction(nameof(Index));
+            }
+
+            var semLista = "Grupo lotado e sem opção de lista de espera.";
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return Json(new { success = false, mensagem = semLista, grupoId = id });
+            TempData["ok"] = semLista;
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SairDaFila(int id) // id = GrupoId
+        public async Task<IActionResult> Sair(int id)
         {
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Login", "Usuarios");
@@ -360,21 +422,278 @@ namespace CriarGrupo.Controllers
             if (!int.TryParse(uidStr, out var uid))
                 return Forbid();
 
-            // procura uma participação em lista de espera
+            var promoted = await _filaService.RemoveAndPromoteNextAsync(id, uid);
+
+            if (promoted)
+                TempData["ok"] = "Você saiu do grupo. O próximo da fila foi inscrito.";
+            else
+                TempData["ok"] = "Você saiu do grupo.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SairDaFila(int id)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Usuarios");
+
+            var uidStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(uidStr, out var uid))
+                return Forbid();
+
             var part = await _context.Participacoes
                 .FirstOrDefaultAsync(p => p.GrupoId == id
                                        && p.UsuarioId == uid
-                                       && p.StatusParticipacao == "Lista de Espera");
+                                       && p.StatusParticipacao == StatusFila);
 
             if (part != null)
             {
-                // Soft delete: apenas muda o status
                 part.StatusParticipacao = StatusCancelado;
                 await _context.SaveChangesAsync();
                 TempData["ok"] = "Você saiu da lista de espera.";
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Filtro(string nome, string estado, string cidade, string modalidade, string espera, string gruposDono, string gruposParticipo)
+        {
+            bool? boolean = null;
+            List<Grupo> dados = new List<Grupo>();
+            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(nome)) nome = null;
+
+            if (estado == "Selecione um estado" || estado == "Nenhum") estado = null;
+
+            if (cidade == "Selecione uma cidade" || cidade == "Nenhuma") cidade = null;
+
+            if (modalidade == "" || modalidade == "Nenhuma") modalidade = null;
+
+            if (espera == "Tem lista de espera" || espera == "Nenhum") espera = null;
+            else
+            {
+                if (espera == "Sim") boolean = true;
+                else boolean = false;
+            }
+
+            if (gruposParticipo == null && gruposDono == null)
+            {
+                dados = await _context.Grupos
+                .Where(g =>
+                    (espera != null ? g.ListaEspera == boolean : true) &&
+                    (estado != null ? g.Estado == estado : true) &&
+                    (cidade != null ? g.Cidade == cidade : true) &&
+                    (modalidade != null ? g.Modalidade == modalidade : true) &&
+                    (nome != null ? g.Nome == nome : true)
+                )
+                .ToListAsync();
+            }
+            else if (gruposDono != null)
+            {
+                if (!int.TryParse(idClaim, out var ownerId)) return Forbid();
+
+                dados = await _context.Grupos
+                    .Where(g =>
+                        (g.UsuarioId == ownerId) &&
+                        (espera != null ? g.ListaEspera == boolean : true) &&
+                        (estado != null ? g.Estado == estado : true) &&
+                        (cidade != null ? g.Cidade == cidade : true) &&
+                        (modalidade != null ? g.Modalidade == modalidade : true) &&
+                        (nome != null ? g.Nome == nome : true)
+                    )
+                    .ToListAsync();
+            }
+            else
+            {
+                if (!int.TryParse(idClaim, out var uid)) return Forbid();
+
+                var gruposId = await _context.Participacoes
+                    .Where(p => p.UsuarioId == uid && p.StatusParticipacao == StatusInscrito)
+                    .Select(p => p.GrupoId)
+                    .ToListAsync();
+
+                foreach (var grupoId in gruposId)
+                {
+                    var grupo = await _context.Grupos
+                        .Where(g =>
+                            (g.Id == grupoId) &&
+                            (espera != null ? g.ListaEspera == boolean : true) &&
+                            (estado != null ? g.Estado == estado : true) &&
+                            (cidade != null ? g.Cidade == cidade : true) &&
+                            (modalidade != null ? g.Modalidade == modalidade : true) &&
+                            (nome != null ? g.Nome == nome : true)
+                        ).FirstOrDefaultAsync();
+
+                    if (grupo != null) dados.Add(grupo);
+                }
+            }
+
+            if (int.TryParse(idClaim, out var uidForView))
+            {
+                var meus = await _context.Participacoes
+                    .Where(p => p.UsuarioId == uidForView && p.StatusParticipacao == StatusInscrito)
+                    .Select(p => p.GrupoId)
+                    .ToListAsync();
+
+                ViewBag.MeusGrupos = new HashSet<int>(meus);
+            }
+            else
+            {
+                ViewBag.MeusGrupos = new HashSet<int>();
+            }
+
+            if (int.TryParse(idClaim, out uidForView))
+            {
+                var meusEmFila = await _context.Participacoes
+                    .Where(p => p.UsuarioId == uidForView && p.StatusParticipacao == StatusFila)
+                    .Select(p => p.GrupoId)
+                    .ToListAsync();
+
+                ViewBag.MeusGruposFila = new HashSet<int>(meusEmFila);
+            }
+            else
+            {
+                ViewBag.MeusGruposFila = new HashSet<int>();
+            }
+
+            var ativosPorGrupo = await _context.Participacoes
+                .Where(p => p.StatusParticipacao == StatusInscrito)
+                .GroupBy(p => p.GrupoId)
+                .Select(g => new { GrupoId = g.Key, Qtde = g.Count() })
+                .ToListAsync();
+
+            var mapaQtde = ativosPorGrupo.ToDictionary(x => x.GrupoId, x => x.Qtde);
+
+            ViewBag.ParticipantesAtivos = mapaQtde;
+
+            var gruposLotados = new HashSet<int>(
+                dados.Where(g =>
+                    g.NumeroMaximoParticipantes > 0
+                    && mapaQtde.TryGetValue(g.Id, out var q)
+                    && q >= g.NumeroMaximoParticipantes
+                )
+                .Select(g => g.Id)
+            );
+
+            List<SelectListItem> items = new List<SelectListItem>();
+            var modalidadesList = await _context.Modalidades.Select(m => m.Nome).ToListAsync();
+
+            items.Add(new SelectListItem { Text = "Pesquisar modalidade", Value = "", Selected = true, Disabled = true });
+            items.Add(new SelectListItem { Text = "Nenhuma", Value = "Nenhuma" });
+
+            foreach (var modalidadeItem in modalidadesList)
+            {
+                items.Add(new SelectListItem { Text = modalidadeItem, Value = modalidadeItem });
+            }
+
+            ViewBag.Modalidades = items;
+
+            if (!modalidadesList.Contains(modalidade) && modalidade != null) ViewBag.Text = "Sim";
+
+            ViewBag.GruposLotados = gruposLotados;
+
+            ViewBag.Estado = estado;
+            ViewBag.Nome = nome;
+            ViewBag.Modalidade = modalidade;
+            ViewBag.Espera = espera;
+            ViewBag.Cidade = cidade;
+            ViewBag.GruposParticipo = gruposParticipo;
+            ViewBag.GruposDono = gruposDono;
+
+            foreach (var dado in dados)
+            {
+                switch (dado.Estado)
+                {
+                    case "AC":
+                        dado.Estado = "Acre";
+                        break;
+                    case "AL":
+                        dado.Estado = "Alagoas";
+                        break;
+                    case "AP":
+                        dado.Estado = "Amapá";
+                        break;
+                    case "AM":
+                        dado.Estado = "Amazonas";
+                        break;
+                    case "BA":
+                        dado.Estado = "Bahia";
+                        break;
+                    case "CE":
+                        dado.Estado = "Ceará";
+                        break;
+                    case "DF":
+                        dado.Estado = "Distrito Federal";
+                        break;
+                    case "ES":
+                        dado.Estado = "Espírito Santo";
+                        break;
+                    case "GO":
+                        dado.Estado = "Goiás";
+                        break;
+                    case "MA":
+                        dado.Estado = "Maranhão";
+                        break;
+                    case "MT":
+                        dado.Estado = "Mato Grosso";
+                        break;
+                    case "MS":
+                        dado.Estado = "Mato Grosso do Sul";
+                        break;
+                    case "MG":
+                        dado.Estado = "Minas Gerais";
+                        break;
+                    case "PA":
+                        dado.Estado = "Pará";
+                        break;
+                    case "PB":
+                        dado.Estado = "Paraíba";
+                        break;
+                    case "PR":
+                        dado.Estado = "Paraná";
+                        break;
+                    case "PE":
+                        dado.Estado = "Pernambuco";
+                        break;
+                    case "PI":
+                        dado.Estado = "Piauí";
+                        break;
+                    case "RJ":
+                        dado.Estado = "Rio de Janeiro";
+                        break;
+                    case "RN":
+                        dado.Estado = "Rio Grande do Norte";
+                        break;
+                    case "RS":
+                        dado.Estado = "Rio Grande do Sul";
+                        break;
+                    case "RO":
+                        dado.Estado = "Rondônia";
+                        break;
+                    case "RR":
+                        dado.Estado = "Roraima";
+                        break;
+                    case "SC":
+                        dado.Estado = "Santa Catarina";
+                        break;
+                    case "SP":
+                        dado.Estado = "São Paulo";
+                        break;
+                    case "SE":
+                        dado.Estado = "Sergipe";
+                        break;
+                    case "TO":
+                        dado.Estado = "Tocantins";
+                        break;
+                }
+            }
+
+            return View("~/Views/Grupos/Index.cshtml", dados);
         }
 
         public async Task<IActionResult> GerenciarParticipantes(int? id)
@@ -391,7 +710,7 @@ namespace CriarGrupo.Controllers
             }
 
             var participantesIds = await _context.Participacoes
-                .Where(p => p.GrupoId == id && p.StatusParticipacao == "Inscrito")
+                .Where(p => p.GrupoId == id && p.StatusParticipacao == StatusInscrito)
                 .Select(p => p.UsuarioId)
                 .ToListAsync();
 
@@ -435,6 +754,7 @@ namespace CriarGrupo.Controllers
 
             return RedirectToAction("GerenciarParticipantes", new { id = grupoId });
         }
+
         public async Task<IActionResult> BaixarRelatorioPDF(int? id)
         {
             if (id == null) return NotFound();
@@ -449,7 +769,7 @@ namespace CriarGrupo.Controllers
             }
 
             var participantesIds = await _context.Participacoes
-                .Where(p => p.GrupoId == id && p.StatusParticipacao == "Inscrito")
+                .Where(p => p.GrupoId == id && p.StatusParticipacao == StatusInscrito)
                 .Select(p => p.UsuarioId)
                 .ToListAsync();
 
@@ -465,9 +785,7 @@ namespace CriarGrupo.Controllers
 
             return File(pdfBytes, "application/pdf", nomeArquivo);
         }
-
     }
-}
 
     public class RelatorioParticipantesPDF : IDocument
     {
@@ -477,7 +795,7 @@ namespace CriarGrupo.Controllers
         public RelatorioParticipantesPDF(Grupo grupo, List<Usuario> participantes)
         {
             _grupo = grupo;
-            _participantes = participantes;
+            _participantes = participantes ?? new List<Usuario>();
         }
 
         public void Compose(IDocumentContainer container)
@@ -517,3 +835,4 @@ namespace CriarGrupo.Controllers
                 });
         }
     }
+}

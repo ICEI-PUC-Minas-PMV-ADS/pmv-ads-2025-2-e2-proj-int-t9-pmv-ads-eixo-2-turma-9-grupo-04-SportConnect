@@ -10,15 +10,234 @@
     ViewData["Title"] = "Index";
 }
 
-<p>
-    <a asp-action="Create" class="btn btn-criar">Criar novo grupo</a>
-</p>
+@section HeadStyles {
+    <style>
+        .formComponents{
+            width: 230px;
+            margin-left: 20px;
+            border-radius: 12px;
+            padding: 6px 12px 6px 12px;
+            height: 38px;
+        }
 
-<h1>Grupos</h1>
+        @@media(max-width: 1550px){
+            .formComponents {
+                width: 200px;
+                font-size: 15px;
+            }
+        }
 
-<p class= "observacao">
-    Observação: se o grupo já estiver com todas as vagas preenchidas, mas você ainda quiser participar, clique no botão "Entrar na lista de espera". Assim, você será incluído na fila de espera e será convocado automaticamente quando uma nova vaga ficar disponível.
-</p>
+        @@media(max-width: 1380px){
+            .filtroData {
+                flex-direction: column;
+                margin-bottom: 30px;
+            }
+
+            .formComponents {
+                width: 350px;
+                font-size: 15px;
+                margin-top: 20px;
+            }
+
+            .formComponents {
+                margin-top: 20px;
+            }
+
+            #nome{
+                margin-top: 0px;
+            }
+
+            #espera{
+                margin-top: 0px;
+                margin-bottom: 20px;
+            }
+
+            #btnSubmit{
+                text-align: center;
+                width: 350px;
+            }
+        }
+    </style>
+}
+
+<div style="margin-top: 30px">
+    <h1>Buscar Grupos</h1>
+
+    <p class="observacao">
+        Observação: se o grupo já estiver com todas as vagas preenchidas, mas você ainda quiser participar, clique no botão "Entrar na lista de espera". Assim, você será incluído na fila de espera e será convocado automaticamente quando uma nova vaga ficar disponível.
+    </p>
+</div>
+
+<div style="margin-left: 20px; margin-top: 30px">
+    <form style="display: flex; flex-direction: column; justify-content: center;" id="filtro" asp-controller="Grupos" asp-action="Filtro">
+        <div class="filtroData" style="display: flex">
+            @if (ViewData["Nome"] != null)
+            {
+                <input class="form-control formComponents" placeholder="Pesquisar nome" value="@ViewData["Nome"]" name="nome" id="nome" type="text" />
+            }
+            @if (ViewData["Nome"] == null)
+            {
+                <input class="form-control formComponents" placeholder="Pesquisar nome" name="nome" id="nome" type="text" />
+            }
+
+            @if (ViewData["Estado"] != null)
+            {
+                <select class="formComponents form-control" name="estado" id="estado" onchange="getCidades()">
+                    <option class="option-estado" value="Nenhum">Nenhum</option>
+                    <option class="option-estado" value="AC">Acre</option>
+                    <option class="option-estado" value="AL">Alagoas</option>
+                    <option class="option-estado" value="AP">Amapá</option>
+                    <option class="option-estado" value="AM">Amazonas</option>
+                    <option class="option-estado" value="BA">Bahia</option>
+                    <option class="option-estado" value="CE">Ceará</option>
+                    <option class="option-estado" value="DF">Distrito Federal</option>
+                    <option class="option-estado" value="ES">Espírito Santo</option>
+                    <option class="option-estado" value="GO">Goiás</option>
+                    <option class="option-estado" value="MA">Maranhão</option>
+                    <option class="option-estado" value="MT">Mato Grosso</option>
+                    <option class="option-estado" value="MS">Mato Grosso do Sul</option>
+                    <option class="option-estado" value="MG">Minas Gerais</option>
+                    <option class="option-estado" value="PA">Pará</option>
+                    <option class="option-estado" value="PB">Paraíba</option>
+                    <option class="option-estado" value="PR">Paraná</option>
+                    <option class="option-estado" value="PE">Pernambuco</option>
+                    <option class="option-estado" value="PI">Piauí</option>
+                    <option class="option-estado" value="RJ">Rio de Janeiro</option>
+                    <option class="option-estado" value="RN">Rio Grande do Norte</option>
+                    <option class="option-estado" value="RS">Rio Grande do Sul</option>
+                    <option class="option-estado" value="RO">Rondônia</option>
+                    <option class="option-estado" value="RR">Roraima</option>
+                    <option class="option-estado" value="SC">Santa Catarina</option>
+                    <option class="option-estado" value="SP">São Paulo</option>
+                    <option class="option-estado" value="SE">Sergipe</option>
+                    <option class="option-estado" value="TO">Tocantins</option>
+                </select>
+            }
+
+            @if (ViewData["Estado"] == null)
+            {
+                <select class="form-control formComponents" name="estado" id="estado" onchange="getCidades()">
+                    <option selected disabled hidden>Selecione um estado</option>
+                    <option value="Nenhum">Nenhum</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
+                </select>
+            }
+
+            <select name="cidade" class="form-control formComponents" disabled id="cidade">
+                <option disabled hidden selected value="">Selecione uma cidade</option>
+            </select>
+
+            <div id="modalidade-section">
+                @if (ViewData["Text"] != null)
+                {
+                    <input value="@Html.Raw(ViewData["Modalidade"])" class="form-control formComponents" placeholder="Pesquisar modalidade" name="modalidade" id="modalidade" type="text" />
+                    <p id="changeSelect" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Voltar</p>
+                }
+                @if(ViewData["Text"] == null)
+                {
+                    @Html.DropDownList("modalidade", (IEnumerable<SelectListItem>)ViewBag.Modalidades, new { @class = "form-control formComponents" })
+                    <p id="changeText" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Não encontrou?</p>
+                }
+            </div>
+
+            @if (ViewData["Espera"] == null)
+            {
+                <select id="espera" class="form-control formComponents" name="espera">
+                    <option hidden selected disabled>Tem lista de espera</option>
+                    <option value="Nenhum">Nenhum</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                </select>
+            }
+            @if (ViewData["Espera"] != null)
+            {
+                <select id="espera" class="form-control formComponents" name="espera">
+                    <option value="@Html.Raw(ViewData["Espera"])" hidden selected>@Html.Raw(ViewData["Espera"])</option>
+                    <option value="Nenhum">Nenhum</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                </select>
+            }
+
+            @if (ViewData["GruposParticipo"] == null)
+            {
+                <input id="gruposParticipoInput" class="form-control visually-hidden" type="text" name="gruposParticipo" value="" />
+            }
+            @if (ViewData["GruposParticipo"] != null)
+            {
+                <input id="gruposParticipoInput" class="form-control visually-hidden" type="text" name="gruposParticipo" value="@Html.Raw(ViewData["GruposParticipo"])" />
+            }
+
+            @if (ViewData["GruposDono"] == null)
+            {
+                <input id="gruposDonoInput" class="form-control visually-hidden" type="text" name="gruposDono" value="" />
+            }
+            @if (ViewData["GruposDono"] != null)
+            {
+                <input id="gruposDonoInput" class="form-control visually-hidden" type="text" name="gruposDono" value="@Html.Raw(ViewData["GruposDono"])" />
+            }
+
+            <input id="btnSubmit" class="btn btn-primary" style="display: flex; align-items: center; border-radius: 10px; font-size: 16px; font-weight: 600; padding: 5px 30px 5px 30px; margin-left: 20px; height: 38px" type="submit" value="Buscar" />
+        </div>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div style="display: flex; align-items: center;">
+                <div style="margin-left: 20px">
+                    @if (ViewData["GruposParticipo"] == null)
+                    {
+                        <a onclick="handleClick(event)" id="gruposParticipo" class="btn" style="border: solid 1px #ced4da; border-radius: 10px; font-size: 16px; font-weight: 400; padding: 5px 25px 5px 25px">Ver grupos em que participo</a>
+                    }
+                    @if (ViewData["GruposParticipo"] != null)
+                    {
+                        <a onclick="handleClick(event)" id="gruposParticipo" class="btn btn-primary" style="color: white; border: solid 1px #ced4da; border-radius: 10px; font-size: 16px; font-weight: 400; padding: 5px 25px 5px 25px">Ver grupos em que participo</a>
+                    }
+                </div>
+
+                <div style="margin-left: 20px">
+                    @if (ViewData["GruposDono"] == null)
+                    {
+                        <a onclick="handleClick(event)" id="gruposDono" class="btn" style="border: solid 1px #ced4da; border-radius: 10px; font-size: 16px; font-weight: 400; padding: 5px 25px 5px 25px">Ver grupos em que administro</a>
+                    }
+                    @if (ViewData["GruposDono"] != null)
+                    {
+                        <a onclick="handleClick(event)" id="gruposDono" class="btn btn-primary" style="color: white; border: solid 1px #ced4da; border-radius: 10px; font-size: 16px; font-weight: 400; padding: 5px 25px 5px 25px">Ver grupos em que administro</a>
+                    }
+                </div>
+
+                <p>
+                    <a asp-action="Create" class="btn btn-primary btn-criar" style="border-radius: 10px; font-size: 16px; font-weight: 600; padding: 5px 25px 5px 25px">Criar novo grupo</a>
+                </p>
+            </div>
+        }
+    </form>
+</div>
 
 @if (TempData["ok"] != null)
 {
@@ -28,15 +247,14 @@
     </script>
 }
 
-<div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+<div class="container" style="margin-top: 50px">
+    <div id="cards-section" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
     @foreach (var item in Model)
     {
         <div class="col">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <p><strong>Nome:</strong> @item.Nome</p>
-                    
                     <p class="mb-1"><strong>Modalidade:</strong> @item.Modalidade</p>
                     <p class="mb-1"><strong>Estado:</strong> @item.Estado</p>
                     <p class="mb-0"><strong>Cidade:</strong> @item.Cidade</p>
@@ -59,14 +277,12 @@
                     else
                     {
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Visualizar</a>
-                           
 
                         var gruposLotados = ViewBag.GruposLotados as HashSet<int>;
                         var lotado = gruposLotados != null && gruposLotados.Contains(item.Id);
 
                         @if (jaParticipa)
                         {
-                                <a href="@Url.Action("Index", "Eventos", new { grupoId = @item.Id })" class="btn btn-primary btn-custom">Eventos</a>
                             @* ✅ Usuário já inscrito: mostra "Participando" (verde), Visualizar e Sair *@
                             <button type="button" class="btn btn-success btn-custom" disabled>Participando</button>
 
@@ -107,7 +323,6 @@
                                 <button type="button" class="btn btn-secondary btn-custom" disabled>Grupo lotado</button>
                             }
                         }
-
                         else
                         {
                             @* Ainda há vagas: participar normalmente *@
@@ -146,10 +361,10 @@
         color: #fff;
     }
 
-        .btn-primary:hover {
-            background-color: #0069d9 !important;
-            border-color: #0062cc !important;
-        }
+    .btn-primary:hover {
+        background-color: #0069d9 !important;
+        border-color: #0062cc !important;
+    }
 
     .btn-success {
         background-color: #28a745 !important;
@@ -188,7 +403,7 @@
         border-radius: 12px;
         border-color: #000;
         margin-top: 20px;
-        margin-left: 40px;
+        margin-left: 20px;
     }
 
     .observacao {
@@ -204,17 +419,179 @@
 
     /* Em telas pequenas (≤ 576px): empilha e deixa os botões com largura cheia */
     @@media (max-width: 576px) {
-        .card-footer
+        .card-footer {
+            flex-direction: column;
+            align-items: stretch; /* os botões ocupam toda a largura do card */
+            gap: 8px; /* espaço vertical entre eles */
+        }
 
-    {
-        flex-direction: column;
-        align-items: stretch; /* os botões ocupam toda a largura do card */
-        gap: 8px; /* espaço vertical entre eles */
-    }
-
-    .card-footer .btn {
-        width: 100%;
-    }
-
+        .card-footer .btn {
+            width: 100%;
+        }
     }
 </style>
+
+<script>
+    const estado = document.getElementById("estado")
+    
+    @if(ViewData["Estado"] != null){
+        <text>
+            const options = document.getElementsByClassName("option-estado")
+            const cidade = document.getElementById("cidade")
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                const arrOptions = [...options]
+
+                arrOptions.forEach((element, index) => {
+                    if(element.value == "@ViewData["Estado"]") estado.selectedIndex = index
+                })
+
+                const result = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estado.value}/municipios?orderBy=nome`)
+                const output = await result.json()
+
+                var cidadeHtml = `<option selected value="">Nenhuma</option>`
+                output.forEach((element, index) => {
+                    if('@Html.Raw(ViewData["Cidade"])' != null && element.nome == '@Html.Raw(ViewData["Cidade"])'){
+                        cidadeHtml += `<option selected value="${element.nome}">${element.nome}</option>`
+                    }
+                    else{
+                        cidadeHtml += `<option value="${element.nome}">${element.nome}</option>`
+                    }
+                })
+
+                cidade.innerHTML = cidadeHtml
+                cidade.disabled = false
+            })
+        </text>
+    }
+
+    const getCidades = async () => {
+        if(estado.value != "Selecione um estado" && estado.value != "Nenhum"){
+            const result = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estado.value}/municipios?orderBy=nome`)
+            const output = await result.json()
+
+            const cidade = document.getElementById("cidade")
+            var cidadesHtml
+
+            output.forEach((element, index) => {
+                if(index == 0){
+                    cidadesHtml += `
+                        <option value="Nenhuma">Nenhuma</option>
+                        <option value="${element.nome}">${element.nome}</option>
+                    `
+                }
+                else{
+                    cidadesHtml += `<option value="${element.nome}">${element.nome}</option>`
+                }
+            })
+
+            cidade.innerHTML = cidadesHtml
+            cidade.disabled = false
+        }
+    }
+
+    const handleClick = (e) => {
+        const inputDono = document.getElementById("gruposDonoInput")
+        const inputParticipo = document.getElementById("gruposParticipoInput")
+        const form = document.getElementById("filtro")
+
+        if(e.target.id == "gruposDono"){
+            if("@Html.Raw(ViewData["GruposDono"])" == ""){
+                inputDono.value = "Sim"
+                inputParticipo.value = ""
+                form.submit()
+            }
+            else{
+                inputDono.value = ""
+                inputParticipo.value = ""
+                form.submit()
+            }
+        }
+        else{
+            if("@Html.Raw(ViewData["GruposParticipo"])" == ""){
+                inputParticipo.value = "Sim"
+                inputDono.value = ""
+                form.submit()
+            }
+            else{
+                inputParticipo.value = ""
+                inputDono.value = ""
+                form.submit()
+            }
+        }
+    }
+
+    const changeInput = (e) => {
+        const section = document.getElementById("modalidade-section")
+        var htmlContent = ""
+
+        if(e.target.id == "changeText"){
+            htmlContent = `
+                <input class="form-control formComponents" placeholder="Pesquisar modalidade" name="modalidade" id="modalidade" type="text" />
+                <p id="changeSelect" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Voltar</p>
+            `
+            section.innerHTML = htmlContent
+        }
+        else{
+            htmlContent = `
+                <select class="form-control formComponents" id="modalidade" name="modalidade">
+                    <option selected disabled>Pesquisar modalidade</option>
+                    <option value="">Nenhuma</option>
+                    <option>Futebol</option>
+                    <option>Vôlei</option>
+                    <option>Futsal</option>
+                    <option>Basquete</option>
+                    <option>Natação</option>
+                    <option>Caminhada e Corrida</option>
+                    <option>Ciclismo</option>
+                    <option>Tênis de Mesa</option>
+                    <option>Musculação</option>
+                    <option>Surf</option>
+                    <option>Skate</option>
+                    <option>Judô</option>
+                    <option>Jiu-Jitsu</option>
+                    <option>Boxe</option>
+                    <option>Capoeira</option>
+                    <option>Handebol</option>
+                    <option>Vôlei de Praia</option>
+                    <option>Futevôlei</option>
+                    <option>Tênis</option>
+                    <option>Atletismo</option>
+                    <option>Ginástica Artística</option>
+                    <option>Ginástica Rítmica</option>
+                    <option>Taekwondo</option>
+                    <option>Karatê</option>
+                    <option>Mountain Bike</option>
+                    <option>Canoagem</option>
+                    <option>Remo</option>
+                    <option>Polo Aquático</option>
+                    <option>Halterofilismo</option>
+                    <option>Golfe</option>
+                    <option>Beisebol</option>
+                    <option>Softbol</option>
+                    <option>Futebol Americano</option>
+                    <option>Rugby</option>
+                    <option>Esgrima</option>
+                    <option>Tiro Esportivo</option>
+                    <option>Hipismo</option>
+                    <option>Badminton</option>
+                    <option>Squash</option>
+                    <option>Peteca</option>
+                    <option>Beach Tennis</option>
+                    <option>Padel</option>
+                    <option>Pesca Esportiva</option>
+                    <option>Triatlo</option>
+                    <option>Muay Thai</option>
+                    <option>Iatismo</option>
+                    <option>Automobilismo</option>
+                    <option>Motociclismo</option>
+                    <option>Breakdance</option>
+                    <option>Xadrez</option>
+                </select>
+
+                <p id="changeText" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Não encontrou?</p>
+            `
+            section.innerHTML = htmlContent
+        }
+    }
+</script>

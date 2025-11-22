@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SportConnect.Models
@@ -18,6 +19,9 @@ namespace SportConnect.Models
         [Required]
         [MaxLength(30)]
         public string StatusParticipacao { get; set; } = "Inscrito"; // "Inscrito" ou "Lista de Espera"
+
+        [Required]
+        public DateTimeOffset DataInscricao { get; set; } = DateTimeOffset.UtcNow;
     }
 }
 

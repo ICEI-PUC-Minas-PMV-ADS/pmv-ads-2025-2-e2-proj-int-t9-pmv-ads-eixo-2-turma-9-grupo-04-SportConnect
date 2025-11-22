@@ -1,16 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\src",
-    "\\src\\SportConnect",
-    "\\src\\SportConnect\\SportConnect",
-    "\\src\\SportConnect\\SportConnect\\Controllers",
-    "\\src\\SportConnect\\SportConnect\\Migrations",
-    "\\src\\SportConnect\\SportConnect\\Models",
-    "\\src\\SportConnect\\SportConnect\\Properties",
-    "\\src\\SportConnect\\SportConnect\\Views",
-    "\\src\\SportConnect\\SportConnect\\Views\\Home"
+    ""
   ],
-  "SelectedNode": "\\src\\SportConnect\\SportConnect\\Views\\Home\\Index.cshtml",
+  "SelectedNode": "\\SportConnect.sln",
   "PreviewInSolutionExplorer": false
 }
