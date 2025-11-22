@@ -132,7 +132,11 @@ namespace SportConnect.Controllers
             // atualiza campos
             original.Nome = evento.Nome;
             original.Descricao = evento.Descricao;
-            
+            original.Cidade = evento.Cidade;
+            original.Bairro = evento.Bairro;
+            original.Rua = evento.Rua;
+            original.Numero = evento.Numero;
+
 
             // string enderecoCompleto = $"{evento.Rua}, {evento.Numero}, {evento.Bairro}, {evento.Cidade}";
             var enderecoCompleto = $"{evento.Rua}, ${evento.Numero}, ${evento.Bairro},${evento.Cidade},MG, Brasil"; 
