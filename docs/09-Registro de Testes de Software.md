@@ -21,13 +21,13 @@
 | **Caso de Teste** 	| **CT04 – Pesquisar grupos** 	|
 |:---:	|:---:	|
 |	Requisito Associado 	| RF-05 A aplicação deve permitir a pesquisa de grupos, seja por nome, localidade ou modalidade. |
-|Registro de evidência | [www.teste.com.br/drive/ct-04]() |
+|Registro de evidência | [www.teste.com.br/drive/ct-04](https://github.com/user-attachments/assets/bc26e5f8-6ca4-470a-8d71-311959125be8) |
 
 
 | **Caso de Teste** 	| **CT05 – Sair do grupo** 	|
 |:---:	|:---:	|
 |	Requisito Associado 	| RF-06 A aplicação deve permitir que o usuário saia de um grupo em que ele é participante. |
-|Registro de evidência | [www.teste.com.br/drive/ct-05]() |
+|Registro de evidência | [www.teste.com.br/drive/ct-05](https://github.com/user-attachments/assets/262bf050-a51f-476d-ada6-b1f1027022aa) |
 
 | **Caso de Teste** 	| **CT06 – Receber notificação** 	|
 |:---:	|:---:	|
@@ -37,19 +37,19 @@
 | **Caso de Teste** 	| **CT07 – Consultar grupo** 	|
 |:---:	|:---:	|
 |	Requisito Associado 	| RF-09 A aplicação deve permitir que o usuário consulte todos os grupos em que ele participa. <br> RF-10 A aplicação deve permitir que o usuário consulte todos os grupos em que ele é administrador. |
-|Registro de evidência | [www.teste.com.br/drive/ct-07]() |
+|Registro de evidência | [www.teste.com.br/drive/ct-07](https://github.com/user-attachments/assets/d4876f13-2a16-4d88-bc70-079aed5634f7) |
 
 
 | **Caso de Teste** 	| **CT08 – Lista de espera** 	|
 |:---:	|:---:	|
 |	Requisito Associado 	| RF-11 A aplicação deve permitir que o usuário entre em uma lista de espera caso o grupo atinja sua capacidade máxima e o administrador tenha habilitado essa opção. <br> RF-04 A aplicação deve permitir a entrada de usuários em grupos. |
-|Registro de evidência | [www.teste.com.br/drive/ct-08]() |
+|Registro de evidência | [www.teste.com.br/drive/ct-08](https://github.com/user-attachments/assets/e27760f8-c00f-49c9-abad-337b355b2262) |
 
 
 | **Caso de Teste** 	| **CT09 – PDF com os participantes** 	|
 |:---:	|:---:	|
 |	Requisito Associado 	| RF-10 A aplicação deve permitir que o usuário consulte todos os grupos em que ele é administrador. <br> RF-12 A aplicação deve permitir que o administrador de um grupo faça o download de um PDF contendo todos os participantes do grupo em que o mesmo gere. |
-|Registro de evidência | [www.teste.com.br/drive/ct-09]() |
+|Registro de evidência | [www.teste.com.br/drive/ct-09](https://github.com/user-attachments/assets/f8b038eb-f3d7-496e-b5dd-ed9d063e463a) |
 
 
 ## Relatório de testes de software
