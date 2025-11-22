@@ -75,6 +75,33 @@ O registro de testes de usabilidade é um documento ou planilha onde são coleta
 | Usuário 4   |        72 seg    |              11                   |      Sim           |     Nenhum                   |         "Achei a interface simples, sem muitas coisas complicadas"                   |                     | 
 | Usuário 5   |         145 seg  |              15                   |       Sim          |      Nenhum, apenas demorou para preencher os dados    |    "Achei difícil porque precisava escrever tudo, não tem jeito mais rápido"     |                     | 
 
+**Cenário 7**:  Edição do grupos criados    
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        40 seg    |              7                   |     Sim            |       Nenhum                 |          "Foram editadas três informações de forma prática e intuitiva".   |                     |      
+| Usuário 2   |        18 seg    |             4                    |        Sim         |        Nenhum                |            "Editei o campo Cidade. Não tive dificuldade".               |                     |      
+| Usuário 3   |        34 seg   |       6           |        Sim         |          Nenhum   |  "Conclui a edição sem erros"                 |                     |  
+| Usuário 4   |        25 seg    |              3                   |      Sim           |     Nenhum                   |         "Editei uma informação na descrição do grupo. Muito fácil!"                   |                     | 
+| Usuário 5   |         27 seg  |              3                   |       Sim          |      Nenhum    |    "Mudei o nome do grupo e salvei sem problemas".     |                     | 
+
+**Cenário 8**:  Visualização e inscrição do usuário nos grupos criados    
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        62 seg    |              9                   |     Sim            |       Nenhum                 |          "Os filtros ajudaram a encontrar o grupo de forma rápida"   |                     |      
+| Usuário 2   |        52 seg    |             7                    |        Sim         |        Nenhum                |            "Os cards são fáceis de visualizar"               |                     |      
+| Usuário 3   |        75 seg   |       18           |        Sim         |          Nenhum   |  "Os botões me ajudaram na navegação da página"                 |                     |  
+| Usuário 4   |        43 seg    |              6                   |      Sim           |     Nenhum                   |         "As informações são claras e objetivas. Gostei!"                   |                     | 
+| Usuário 5   |         60 seg  |              8                   |       Sim          |      Nenhum    |    "Localizar o grupo pelo nome facilitou o processo"     |                     |
+
+**Cenário 9**:  Lista de espera e cancelamento da participação     
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        38 seg    |              5                   |     Sim            |       Nenhum                 |          "Usei a lista de espera facilmente e achei tudo muito intuitivo."   |                     |      
+| Usuário 2   |        61 seg    |             12                    |        Sim         |        Nenhum                |            "Consegui entrar e cancelar minha participação sem nenhuma dificuldade."               |                     |      
+| Usuário 3   |        47 seg   |       8           |        Sim         |          Nenhum   |  "Achei a plataforma clara e consegui realizar tudo com facilidade."                 |                     |  
+| Usuário 4   |        59 seg    |              8                   |      Sim           |     Nenhum                   |         "Tive uma experiência bem fluida e as funcionalidades responderam rapidamente."                   |                     | 
+| Usuário 5   |         54 seg  |              10                   |       Sim          |      Nenhum    |    "Entendi tudo de forma simples e consegui usar a plataforma sem complicações."     |                     |
+
 ## Relatório dos testes de usabilidade 
 
 ### Objetivo:
