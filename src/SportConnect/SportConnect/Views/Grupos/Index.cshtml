@@ -373,6 +373,7 @@
                         @if (jaParticipa)
                         {
                             @* ✅ Usuário já inscrito: mostra "Participando" (verde), Visualizar e Sair *@
+                                <a href="@Url.Action("Index", "Eventos", new { grupoId = @item.Id })" class="btn btn-primary btn-custom">Eventos</a>
                             <button type="button" class="btn btn-success btn-custom" disabled>Participando</button>
 
                             <form asp-action="Sair" asp-route-id="@item.Id" method="post" class="d-inline">
