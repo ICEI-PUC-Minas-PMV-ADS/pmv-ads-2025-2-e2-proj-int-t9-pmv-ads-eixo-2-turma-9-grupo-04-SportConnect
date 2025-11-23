@@ -64,6 +64,8 @@ As tabelas que se seguem apresentam os requisitos funcionais e não funcionais q
 |RF-10| A aplicação deve permitir que o usuário consulte todos os grupos em que ele é administrador  | BAIXA |
 |RF-11| A aplicação deve permitir que o usuário entre em uma lista de espera caso o grupo atinja sua capacidade máxima e o administrador tenha habilitado essa opção  | BAIXA |
 |RF-12| A aplicação deve permitir que o administrador de um grupo faça o download de um PDF contendo todos os participantes do grupo em que o mesmo gere  | BAIXA |
+|RF-13| A aplicação deve permitir que o administrador remova participantes de seu grupo  | MÉDIA |
+|RF-14| A aplicação deve permitir que o usuário consulte o endereço de um evento por meio de um mapa | MÉDIA |
 
 ### Requisitos não Funcionais
 
