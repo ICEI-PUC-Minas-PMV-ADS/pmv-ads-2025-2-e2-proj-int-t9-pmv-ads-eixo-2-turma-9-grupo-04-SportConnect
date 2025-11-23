@@ -12,8 +12,8 @@ using SportConnect.Models;
 namespace SportConnect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251123142102_Notificacoes2")]
-    partial class Notificacoes2
+    [Migration("20251123221724_SportConnect-Migration")]
+    partial class SportConnectMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
