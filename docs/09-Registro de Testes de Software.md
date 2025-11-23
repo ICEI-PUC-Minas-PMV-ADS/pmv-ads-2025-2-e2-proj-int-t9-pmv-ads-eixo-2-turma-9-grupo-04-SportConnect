@@ -32,7 +32,7 @@
 | **Caso de Teste** 	| **CT06 – Receber notificação** 	|
 |:---:	|:---:	|
 |	Requisito Associado 	| RF-08 A aplicação deve permitir que o usuário receba notificações sobre novas atividades adicionadas aos grupos onde o mesmo participa. |
-|Registro de evidência | [www.teste.com.br/drive/ct-06]() |
+|Registro de evidência | [www.teste.com.br/drive/ct-06](https://github.com/user-attachments/assets/25e3fe71-b6f9-4c02-a0d8-21b83b0b70eb) |
 
 | **Caso de Teste** 	| **CT07 – Consultar grupo** 	|
 |:---:	|:---:	|
