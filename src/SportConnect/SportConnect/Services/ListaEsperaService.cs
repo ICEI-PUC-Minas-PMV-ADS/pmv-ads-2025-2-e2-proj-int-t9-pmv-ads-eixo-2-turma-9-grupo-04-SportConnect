@@ -106,6 +106,13 @@ namespace SportConnect.Services
                     {
                         proximo.StatusParticipacao = StatusInscrito;
                         _db.Participacoes.Update(proximo);
+                        _db.Notificacoes.Add(new Notificacao
+                        {
+                            UsuarioId = proximo.UsuarioId,
+                            Mensagem = $"Você entrou no grupo {grupo.Nome} pela lista de espera!",
+                            DataEnvio = DateTimeOffset.UtcNow,
+                            Lida = "Nao"
+                        });
                         await _db.SaveChangesAsync(ct);
 
                         await tx.CommitAsync(ct);

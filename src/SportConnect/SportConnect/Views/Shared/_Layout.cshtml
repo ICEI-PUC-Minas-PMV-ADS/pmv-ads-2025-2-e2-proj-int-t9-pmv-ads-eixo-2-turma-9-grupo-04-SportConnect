@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     @RenderSection("HeadStyles", required: false)
     <style>
-        html{
+        html {
             height: 100%;
         }
 
@@ -22,7 +22,7 @@
             height: 100%;
         }
 
-        .dropdown-item:hover{
+        .dropdown-item:hover {
             background-color: #2081F9 !important;
         }
 
@@ -39,40 +39,40 @@
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
         }
 
-        .btn-close{
+        .btn-close {
             opacity: 1 !important;
         }
 
-        @@media (max-width: 830px){
-            .nav-item{
+        @@media (max-width: 830px) {
+            .nav-item {
                 font-size: 14px;
             }
         }
 
         @@media (max-width: 767px) {
-            .nav-item{
+            .nav-item {
                 font-size: 17px;
             }
 
-            .offcanvas{
+            .offcanvas {
                 padding: 17px 15px 0px 15px;
             }
 
-            #sideBarNav{
+            #sideBarNav {
                 display: block !important;
             }
 
-            #navBar{
+            #navBar {
                 display: none !important;
             }
         }
 
-        @@media (max-width: 600px){
-            .navbar{
+        @@media (max-width: 600px) {
+            .navbar {
                 padding: 0px 20px 0px 20px !important;
             }
 
-            #logo{
+            #logo {
                 height: 50px !important;
                 width: 60px;
             }
@@ -126,44 +126,51 @@
                                     <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Login">Login</a>
                                 </li>
                             }
-                        
+
                             @if (User.Identity.IsAuthenticated && ((controller == "Usuarios" && (action == "Editar" || action == "Excluir" || action == "Detalhes")) || (controller != "Usuarios" && controller != "Home")))
                             {
                                 <div id="navBar" style="display: flex;">
-                                    <li class="nav-item" style="display: flex; align-items: center; margin-right: 20px">
-                                        <i style="color: white; font-size: 24px" class="fa-solid fa-bell"></i>
-                                        <a class="nav-link text-white" asp-area="">Notificações</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <div class="dropdown">
-                                            <a style="text-decoration: none; display: flex; align-items: center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <img style="height: 50px;" src="~/images/usuario-foto.png" />
-                                                <p style="margin: 0px" class="nav-link text-white">@User.Identity.Name</p>
+                                <li class="position-relative nav-item" style="display: flex; align-items: center; margin-right: 20px">
+                                    <i style="color: white; font-size: 24px" class="fa-solid fa-bell"></i>
 
-                                                <ul style="padding: 0px !important; min-width: 0px; width: 122px !important; background: #09264A; border: solid 1px white" class="dropdown-menu">
-                                                    <li style="border-bottom: solid 1px white"><a asp-controller="Usuarios" asp-action="Detalhes" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value" style="padding: 8px 0px 8px 0px" class="dropdown-item text-white text-center">Perfil</a></li>
-                                                    <li><a style="padding: 8px 0px 8px 0px" asp-area="" asp-controller="Usuarios" asp-action="Logout" class="text-center dropdown-item text-white">Sair</a></li>
-                                                </ul>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </div>
+                                    @if (ViewData["NotificacoesCount"] != null && ViewData["NotificacoesCount"].ToString() != "0")
+                                    {
+                                        <p style="display: flex; align-items: center; justify-content: center; padding: 3px; top: 8px; left: 10px; position: absolute; color: white; background-color: #FFC107; border-radius: 50%; width: 18px; height: 18px; text-align: center; font-size: 13px !important;">@ViewData["NotificacoesCount"]</p>
+                                    }
 
-                                <div id="sideBarNav" style="display: none">
-                                    <li class="nav-item">
-                                        <a class="nav-link text-white" asp-controller="Usuarios" asp-action="Detalhes" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value">Perfil</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link text-white">Notificações</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a asp-area="" asp-controller="Usuarios" asp-action="Logout" class="nav-link text-white">Sair</a>
-                                    </li>
-                                </div>
-                            }
-                        </ul>
-                    </div>
+                                    <a class="nav-link text-white" asp-area="" asp-controller="Notificacoes" asp-action="Index" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value">Notificações</a>
+                                </li>
+                                <li class="nav-item">
+                                    <div class="dropdown">
+                                        <a style="text-decoration: none; display: flex; align-items: center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <img style="height: 50px;" src="~/images/usuario-foto.png" />
+
+                                            <p style="margin: 0px" class="nav-link text-white">@User.Identity.Name</p>
+
+                                            <ul style="padding: 0px !important; min-width: 0px; width: 122px !important; background: #09264A; border: solid 1px white" class="dropdown-menu">
+                                                <li style="border-bottom: solid 1px white"><a asp-controller="Usuarios" asp-action="Detalhes" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value" style="padding: 8px 0px 8px 0px" class="dropdown-item text-white text-center">Perfil</a></li>
+                                                <li><a style="padding: 8px 0px 8px 0px" asp-area="" asp-controller="Usuarios" asp-action="Logout" class="text-center dropdown-item text-white">Sair</a></li>
+                                            </ul>
+                                        </a>
+                                    </div>
+                                </li>
+                        </div>
+
+                        <div id="sideBarNav" style="display: none">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Usuarios" asp-action="Detalhes" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value">Perfil</a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-area="" asp-controller="Notificacoes" asp-action="Index" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value" class="nav-link text-white">Notificações</a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-area="" asp-controller="Usuarios" asp-action="Logout" class="nav-link text-white">Sair</a>
+                            </li>
+                        </div>
+                    }
+                    </ul>
                 </div>
+            </div>
             </div>
         </nav>
     </header>
@@ -178,7 +185,7 @@
     <script src="https://kit.fontawesome.com/513aa25e9d.js" crossorigin="anonymous"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    
+
 
 
 </body>

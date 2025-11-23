@@ -18,6 +18,13 @@ namespace SportConnect.Controllers
             _context = context;
         }
 
+        private int? GetCurrentUserId()
+        {
+            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(idClaim, out var id)) return id;
+            return null;
+        }
+
         public IActionResult Cadastrar()
         {
             return View();
@@ -28,14 +35,14 @@ namespace SportConnect.Controllers
         {
             if (ModelState.IsValid)
             {
-                if(usuario == null)
+                if (usuario == null)
                 {
                     return NotFound();
                 }
 
                 var dados = _context.Usuarios.FirstOrDefault(c => c.Email == usuario.Email || c.Cpf == usuario.Cpf);
 
-                if(dados == null)
+                if (dados == null)
                 {
                     usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
                     usuario.Cpf = usuario.Cpf.Replace(".", "").Replace("-", "");
@@ -68,7 +75,7 @@ namespace SportConnect.Controllers
 
             var dados = _context.Usuarios.FirstOrDefault(c => c.Email == usuario.Email);
 
-            if(dados == null)
+            if (dados == null)
             {
                 ViewBag.Message = "Dados incorretos!";
                 return View();
@@ -95,7 +102,7 @@ namespace SportConnect.Controllers
                 };
 
                 await HttpContext.SignInAsync(principal, props);
-                
+
                 return RedirectToAction("Index", "Grupos");
             }
             else
@@ -126,14 +133,14 @@ namespace SportConnect.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmarSenha(Usuario usuario)
         {
-            if(usuario.Senha == null || usuario.Email == null)
+            if (usuario.Senha == null || usuario.Email == null)
             {
                 return NotFound();
             }
 
             var dados = _context.Usuarios.FirstOrDefault(c => c.Email == usuario.Email);
 
-            if(dados == null)
+            if (dados == null)
             {
                 return RedirectToAction("Sucesso");
             }
@@ -153,19 +160,19 @@ namespace SportConnect.Controllers
         [Authorize]
         public async Task<IActionResult> Detalhes(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if(int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) != id)
+            if (int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) != id)
             {
                 return RedirectToAction("AcessoNegado");
             }
 
             var dados = await _context.Usuarios.FindAsync(id);
 
-            if(dados == null)
+            if (dados == null)
             {
                 return NotFound();
             }
@@ -257,13 +264,18 @@ namespace SportConnect.Controllers
                     break;
             }
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             return View(dados);
         }
 
         [Authorize]
         public async Task<IActionResult> Editar(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -275,12 +287,17 @@ namespace SportConnect.Controllers
 
             var dados = await _context.Usuarios.FindAsync(id);
 
-            if(dados == null)
+            if (dados == null)
             {
                 return NotFound();
             }
 
             dados.Cpf = Convert.ToUInt64(dados.Cpf).ToString(@"000\.000\.000\-00");
+
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
 
             return View(dados);
         }
@@ -289,7 +306,7 @@ namespace SportConnect.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(int id, Usuario usuario)
         {
-            if(id != usuario.Id)
+            if (id != usuario.Id)
             {
                 return NotFound();
             }
@@ -297,14 +314,14 @@ namespace SportConnect.Controllers
             usuario.Cpf = usuario.Cpf.Replace("-", "").Replace(".", "");
             _context.Update(usuario);
             await _context.SaveChangesAsync();
-            
+
             return RedirectToAction("Detalhes", new { id = usuario.Id });
         }
 
         [Authorize]
         public async Task<IActionResult> Excluir(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -316,7 +333,7 @@ namespace SportConnect.Controllers
 
             var dados = await _context.Usuarios.FindAsync(id);
 
-            if(dados == null)
+            if (dados == null)
             {
                 return NotFound();
             }

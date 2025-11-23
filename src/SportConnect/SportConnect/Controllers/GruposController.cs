@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using CriarGrupo.Models;
+﻿using CriarGrupo.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,6 +8,12 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SportConnect.Models;
 using SportConnect.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace SportConnect.Controllers
 {
@@ -194,6 +195,11 @@ namespace SportConnect.Controllers
                 }
             }
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == uid && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             ViewBag.Espera = null;
 
             return View(dados);
@@ -213,6 +219,13 @@ namespace SportConnect.Controllers
             }
 
             ViewBag.Modalidades = items;
+
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
+            ViewBag.Espera = null;
 
             return View();
         }
@@ -260,6 +273,13 @@ namespace SportConnect.Controllers
 
             ViewBag.Modalidades = items;
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
+            ViewBag.Espera = null;
+
             return View(grupo);
         }
 
@@ -300,6 +320,13 @@ namespace SportConnect.Controllers
 
             ViewBag.CurrentUserId = GetCurrentUserId();
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
+            ViewBag.Espera = null;
+
             return View(dados);
         }
 
@@ -313,6 +340,11 @@ namespace SportConnect.Controllers
             var userId = GetCurrentUserId();
             if (userId == null) return Challenge();
             if (grupo.UsuarioId != userId) return Forbid();
+
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
 
             return View(grupo);
         }
@@ -489,7 +521,7 @@ namespace SportConnect.Controllers
                     (estado != null ? g.Estado == estado : true) &&
                     (cidade != null ? g.Cidade == cidade : true) &&
                     (modalidade != null ? g.Modalidade == modalidade : true) &&
-                    (nome != null ? g.Nome == nome : true)
+                    (nome != null ? g.Nome.Contains(nome) : true)
                 )
                 .ToListAsync();
             }
@@ -504,7 +536,7 @@ namespace SportConnect.Controllers
                         (estado != null ? g.Estado == estado : true) &&
                         (cidade != null ? g.Cidade == cidade : true) &&
                         (modalidade != null ? g.Modalidade == modalidade : true) &&
-                        (nome != null ? g.Nome == nome : true)
+                        (nome != null ? g.Nome.Contains(nome) : true)
                     )
                     .ToListAsync();
             }
@@ -526,7 +558,7 @@ namespace SportConnect.Controllers
                             (estado != null ? g.Estado == estado : true) &&
                             (cidade != null ? g.Cidade == cidade : true) &&
                             (modalidade != null ? g.Modalidade == modalidade : true) &&
-                            (nome != null ? g.Nome == nome : true)
+                            (nome != null ? g.Nome.Contains(nome) : true)
                         ).FirstOrDefaultAsync();
 
                     if (grupo != null) dados.Add(grupo);
@@ -693,6 +725,11 @@ namespace SportConnect.Controllers
                 }
             }
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             return View("~/Views/Grupos/Index.cshtml", dados);
         }
 
@@ -720,6 +757,11 @@ namespace SportConnect.Controllers
 
             ViewBag.Participantes = participantes;
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             return View(grupo);
         }
 
@@ -743,9 +785,21 @@ namespace SportConnect.Controllers
 
             if (participacao != null)
             {
-                _context.Participacoes.Remove(participacao);
-                await _context.SaveChangesAsync();
-                TempData["Sucesso"] = "Participante removido com sucesso!";
+                bool? promotedUserId = await _filaService.RemoveAndPromoteNextAsync(grupoId, usuarioId);
+
+                if (promotedUserId.HasValue && promotedUserId.Value)
+                    if (grupo.ListaEspera)
+                    {
+                        TempData["Sucesso"] = "Participante removido com sucesso, adicionado o próxima da fila!";
+                    }
+                    else
+                    {
+                        TempData["Sucesso"] = "Participante removido com sucesso!";
+                    }
+
+                //_context.Participacoes.Remove(participacao);
+                //await _context.SaveChangesAsync();
+                //TempData["Sucesso"] = "Participante removido com sucesso!";
             }
             else
             {
