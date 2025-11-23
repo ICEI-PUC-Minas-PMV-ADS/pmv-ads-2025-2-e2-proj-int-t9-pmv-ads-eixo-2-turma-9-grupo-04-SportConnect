@@ -61,3 +61,75 @@ Tela que permite editar os dados cadastrados do usuário.
 <img width="1991" height="2005" alt="Image" src="https://github.com/user-attachments/assets/83e9d289-d143-4358-80ea-5d982f6227b1" />
 
 ---
+
+### Tela de Busca de Grupos
+
+Tela que permite a realizar a busca de grupos cadastrados.
+
+<img width="2468" height="1643" alt="Image" src="https://github.com/user-attachments/assets/100bb581-f2f7-4dc5-bcaf-d94350df53d6" />
+
+---
+
+### Tela de Criação de Grupos
+
+Tela que permite o cadastro de grupos.
+
+<img width="1991" height="2035" alt="Image" src="https://github.com/user-attachments/assets/a181b49a-4b98-4f8d-902a-8a91a3835623" />
+
+---
+
+### Tela de Visualização de Grupos
+
+Tela que permite a visualização de grupos.
+
+<img width="1991" height="1303" alt="Image" src="https://github.com/user-attachments/assets/b8bf02d9-3a24-4807-a341-04e6320fb2e8" />
+
+---
+
+### Tela de Edição de Grupos
+
+Tela que permite a edição de grupos.
+
+<img width="1991" height="1964" alt="Image" src="https://github.com/user-attachments/assets/5fff0122-dad1-4da6-ae06-291ee53b3141" />
+
+---
+
+### Tela de Visualização de Eventos
+
+Tela que permite a visualização de eventos.
+
+<img width="1991" height="1789" alt="Image" src="https://github.com/user-attachments/assets/7609a149-e07d-4fd1-9d68-40ba2676550b" />
+
+---
+
+### Tela de Criação de Eventos
+
+Tela que permite a criação de eventos.
+
+<img width="1991" height="1798" alt="Image" src="https://github.com/user-attachments/assets/b22aadcf-b8c2-4e78-be3b-0369146c8570" />
+
+---
+
+### Tela de Edição de Eventos
+
+Tela que permite a criação de eventos.
+
+<img width="1991" height="1964" alt="Image" src="https://github.com/user-attachments/assets/35280fc2-5441-4ce6-bde7-ff63872135be" />
+
+---
+
+### Tela de Gerenciamento de Participantes
+
+Tela que permite o gerenciamento dos participantes de um grupo.
+
+<img width="2032" height="1074" alt="Image" src="https://github.com/user-attachments/assets/c79a504b-efb4-45e9-a4bc-75543196660a" />
+
+---
+
+### Tela de Notificações
+
+Tela que permite visualizar as notificações de um usuário.
+
+<img width="1991" height="1651" alt="Image" src="https://github.com/user-attachments/assets/af0873b0-1f82-4eed-94b9-131b5ddbcccb" />
+
+---
