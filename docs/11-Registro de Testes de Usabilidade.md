@@ -102,6 +102,33 @@ O registro de testes de usabilidade é um documento ou planilha onde são coleta
 | Usuário 4   |        59 seg    |              8                   |      Sim           |     Nenhum                   |         "Tive uma experiência bem fluida e as funcionalidades responderam rapidamente."                   |                     | 
 | Usuário 5   |         54 seg  |              10                   |       Sim          |      Nenhum    |    "Entendi tudo de forma simples e consegui usar a plataforma sem complicações."     |                     |
 
+**Cenário 10**:  Criação do evento    
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        75 seg    |              9                   |     Sim            |       Nenhum                 |          "Criei um evento rapidamente e achei o processo muito simples."   |                     |      
+| Usuário 2   |        87 seg    |             9                    |        Sim         |        Nenhum                |            "Gostei da clareza dos campos e consegui cadastrar tudo sem dúvidas."               |                     |      
+| Usuário 3   |        102 seg   |       10           |        Sim         |          Nenhum   |  "A plataforma me guiou bem e finalizei o evento com facilidade."                 |                     |  
+| Usuário 4   |        83 seg    |              9                   |      Sim           |     Nenhum                   |         "Adorei a interface, foi bem intuitivo criação do evento."                   |                     | 
+| Usuário 5   |         94 seg  |              9                   |       Sim          |      Nenhum    |    "Consegui configurar todos os detalhes sem complicações."     |                     |
+
+**Cenário 11**:  Edição do evento    
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        37 seg    |              4                   |     Sim            |       Nenhum                 |          "A interface de edição é clara e consegui ajustar os detalhes rapidamente."   |                     |      
+| Usuário 2   |        52 seg    |             6                    |        Sim         |        Nenhum                |            "Consegui editar meu evento facilmente e as mudanças foram salvas sem erro."               |                     |      
+| Usuário 3   |        44 seg   |       5           |        Sim         |          Nenhum   |  "Alterei informações do evento sem dificuldade e tudo funcionou bem."                 |                     |  
+| Usuário 4   |        39 seg    |              4                   |      Sim           |     Nenhum                   |         "Fiz as modificações necessárias e o sistema respondeu de forma ágil."                   |                     | 
+| Usuário 5   |         53 seg  |              8                   |       Sim          |      Nenhum    |    "Gostei de como as opções de edição são organizadas e intuitivas."     |                     |
+
+**Cenário 12**:  Excluir evento    
+| **Usuário**  | **Tempo Total (seg)** | **Quantidade de cliques** | **Tarefa foi concluída?** (Sim/Não) | **Erros Cometidos** | **Feedback do Usuário** |
+|-------------|--------------------|---------------------------------|-----------------|------------------------|------------------------------|
+| Usuário 1   |        15 seg    |              3                   |     Sim            |       Nenhum                 |          "Consegui excluir meu evento rapidamente e o sistema confirmou a ação de forma clara."   |                     |      
+| Usuário 2   |        17 seg    |             3                    |        Sim         |        Nenhum                |            "A exclusão foi simples e direta, sem complicações."               |                     |      
+| Usuário 3   |        24 seg   |       3           |        Sim         |          Nenhum   |  "Deletei o evento com facilidade e tudo funcionou como esperado."                 |                     |  
+| Usuário 4   |        19 seg    |              3                   |      Sim           |     Nenhum                   |         "A opção de excluir é bem visível e o processo foi rápido."                   |                     | 
+| Usuário 5   |         21 seg  |              3                   |       Sim          |      Nenhum    |    "Gostei da confirmação antes da exclusão, isso me deixou mais seguro."     |                     |
+
 ## Relatório dos testes de usabilidade 
 
 ### Objetivo:
