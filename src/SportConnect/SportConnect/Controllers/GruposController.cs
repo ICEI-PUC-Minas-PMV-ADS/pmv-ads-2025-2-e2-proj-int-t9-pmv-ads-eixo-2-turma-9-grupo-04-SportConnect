@@ -14,6 +14,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SportConnect.Controllers
 {
@@ -775,41 +776,41 @@ namespace SportConnect.Controllers
             var grupo = await _context.Grupos.FindAsync(grupoId);
             if (grupo == null) return NotFound();
 
-            if (grupo.UsuarioId != loggedInUserId.Value)
-            {
-                return Forbid();
-            }
+            if (grupo.UsuarioId != loggedInUserId.Value) return Forbid();
 
             var participacao = await _context.Participacoes
                 .FirstOrDefaultAsync(p => p.GrupoId == grupoId && p.UsuarioId == usuarioId);
 
-            if (participacao != null)
+            if (participacao == null)
             {
-                bool? promotedUserId = await _filaService.RemoveAndPromoteNextAsync(grupoId, usuarioId);
+                TempData["MensagemRemocao"] = "Participante não encontrado!";
+                return RedirectToAction("GerenciarParticipantes", new { id = grupoId });
+            }
 
-                if (promotedUserId.HasValue && promotedUserId.Value)
-                    if (grupo.ListaEspera)
-                    {
-                        TempData["Sucesso"] = "Participante removido com sucesso, adicionado o próxima da fila!";
-                    }
-                    else
-                    {
-                        TempData["Sucesso"] = "Participante removido com sucesso!";
-                    }
 
-                //_context.Participacoes.Remove(participacao);
-                //await _context.SaveChangesAsync();
-                //TempData["Sucesso"] = "Participante removido com sucesso!";
+            bool promoted = await _filaService.RemoveAndPromoteNextAsync(grupoId, usuarioId);
+
+            if (_context.Participacoes.Any(p => p.GrupoId == grupoId && p.UsuarioId == usuarioId))
+            {
+                _context.Participacoes.Remove(participacao);
+                await _context.SaveChangesAsync();
+            }
+
+            string mensagem;
+            if (promoted)
+            {
+                mensagem = "Participante removido! Próximo da fila inscrito.";
             }
             else
             {
-                TempData["Erro"] = "Participante não encontrado.";
+                mensagem = "Participante removido!";
             }
+
+            TempData["MensagemRemocao"] = mensagem;
 
             return RedirectToAction("GerenciarParticipantes", new { id = grupoId });
         }
-
-        public async Task<IActionResult> BaixarRelatorioPDF(int? id)
+public async Task<IActionResult> BaixarRelatorioPDF(int? id)
         {
             if (id == null) return NotFound();
 
@@ -831,7 +832,9 @@ namespace SportConnect.Controllers
                 .Where(u => participantesIds.Contains(u.Id))
                 .ToListAsync();
 
-            var relatorio = new RelatorioParticipantesPDF(grupo, participantes);
+            string caminhoImagem = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo_relatorio.png");
+
+            var relatorio = new RelatorioParticipantesPDF(grupo, participantes, caminhoImagem);
 
             byte[] pdfBytes = relatorio.GeneratePdf();
 
@@ -845,11 +848,13 @@ namespace SportConnect.Controllers
     {
         private readonly Grupo _grupo;
         private readonly List<Usuario> _participantes;
+        private readonly string _caminhoLogo;
 
-        public RelatorioParticipantesPDF(Grupo grupo, List<Usuario> participantes)
+        public RelatorioParticipantesPDF(Grupo grupo, List<Usuario> participantes, string caminhoLogo)
         {
             _grupo = grupo;
             _participantes = participantes ?? new List<Usuario>();
+            _caminhoLogo = caminhoLogo;
         }
 
         public void Compose(IDocumentContainer container)
@@ -859,34 +864,102 @@ namespace SportConnect.Controllers
                 {
                     page.Margin(50);
                     page.Size(PageSizes.A4);
+                    page.DefaultTextStyle(x => x.FontSize(12));
 
-                    page.Header()
-                        .Text($"Relatório de Participantes: {_grupo.Nome}")
-                        .SemiBold().FontSize(20);
+                    page.Header().Element(ComposeHeader);
 
-                    page.Content()
-                        .PaddingVertical(1, Unit.Centimetre)
-                        .Column(col =>
-                        {
-                            col.Spacing(5);
+                    page.Content().Element(ComposeContent);
 
-                            col.Item().Text("Nome").Bold();
-
-                            foreach (var user in _participantes)
-                            {
-                                col.Item().Text(user.Nome);
-                                col.Item().LineHorizontal(0.5f);
-                            }
-                        });
-
-                    page.Footer()
-                        .AlignCenter()
-                        .Text(x =>
-                        {
-                            x.Span("Página ");
-                            x.CurrentPageNumber();
-                        });
+                    page.Footer().Element(ComposeFooter);
                 });
+        }
+
+        void ComposeHeader(IContainer container)
+        {
+            container.Column(column =>
+            {
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().Column(col =>
+                    {
+                        col.Item().AlignCenter().Text("Relatório de Participantes")
+                           .FontSize(20).SemiBold().FontColor(Colors.Black);
+
+                        col.Item().PaddingTop(5).AlignCenter().Text("Este documento apresenta a lista de participantes inscritos no grupo detalhado abaixo.")
+                           .FontSize(10).FontColor(Colors.Grey.Darken2);
+                    });
+
+                    if (!string.IsNullOrEmpty(_caminhoLogo) && System.IO.File.Exists(_caminhoLogo))
+                    {
+                        row.ConstantItem(60).AlignRight().Image(_caminhoLogo).FitArea();
+                    }
+                });
+
+                column.Item().PaddingTop(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+                column.Item().PaddingVertical(10);
+
+                column.Item().Border(1).BorderColor(Colors.Grey.Lighten2).Padding(10).Row(row =>
+                {
+                    row.RelativeItem().Column(c =>
+                    {
+                        c.Item().Text(text => { text.Span("Grupo: ").SemiBold(); text.Span(_grupo.Nome); });
+                        c.Item().Text(text => { text.Span("Modalidade: ").SemiBold(); text.Span(_grupo.Modalidade ?? "Não informada"); });
+                        c.Item().Text(text => { text.Span("Descrição: ").SemiBold(); text.Span(_grupo.Descricao ?? "-"); });
+                    });
+
+                    row.RelativeItem().Column(c =>
+                    {
+                        c.Item().Text(text => { text.Span("Local: ").SemiBold(); text.Span($"{_grupo.Cidade} - {_grupo.Estado}"); });
+                        c.Item().Text(text => { text.Span("Total Inscritos: ").SemiBold(); text.Span($"{_participantes.Count}"); });
+                        c.Item().Text(text => { text.Span("Data do Relatório: ").SemiBold(); text.Span(DateTime.Now.ToString("dd/MM/yyyy HH:mm")); });
+                    });
+                });
+
+                column.Item().PaddingBottom(20);
+            });
+        }
+
+        void ComposeContent(IContainer container)
+        {
+            container.PaddingVertical(10).Column(col =>
+            {
+                col.Item().Row(row =>
+                {
+                    row.ConstantItem(30).Text("");
+                    row.RelativeItem().Text("Nome do Participante").Bold();
+                });
+
+                col.Item().LineHorizontal(0.5f).LineColor(Colors.Black);
+
+                int index = 1;
+                foreach (var user in _participantes)
+                {
+                    col.Item().PaddingVertical(2).Row(row =>
+                    {
+                        row.ConstantItem(30).Text($"{index}.");
+                        row.RelativeItem().Text(user.Nome);
+                    });
+
+                    col.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten3);
+                    index++;
+                }
+
+                if (_participantes.Count == 0)
+                {
+                    col.Item().PaddingTop(10).Text("Nenhum participante inscrito no momento.").Italic().FontColor(Colors.Grey.Medium);
+                }
+            });
+        }
+
+        void ComposeFooter(IContainer container)
+        {
+            container.PaddingTop(10).Column(col =>
+            {
+                col.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten2);
+
+                col.Item().PaddingTop(5).Text("Informações extraídas da plataforma SportConnect")
+                    .FontSize(9).FontColor(Colors.Grey.Medium);
+            });
         }
     }
 }

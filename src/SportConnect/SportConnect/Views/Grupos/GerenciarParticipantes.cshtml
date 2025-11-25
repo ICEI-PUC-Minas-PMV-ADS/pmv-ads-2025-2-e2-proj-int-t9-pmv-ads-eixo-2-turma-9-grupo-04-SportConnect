@@ -1,7 +1,7 @@
 ﻿@model CriarGrupo.Models.Grupo
 
 @{
-    ViewData["Title"] = "Remover Participantes";
+    ViewData["Title"] = "Gerenciar Participantes";
 }
 
 <div class="container mt-4">
@@ -21,6 +21,16 @@
             <span>Download Relatório</span>
         </a>
     </div>
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">@TempData["Sucesso"]</div>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Erro"]</div>
+    }
+
     <ul class="list-group">
         @if (ViewBag.Participantes != null && ((List<Usuario>)ViewBag.Participantes).Any(u => u.Id != Model.UsuarioId))
         {
@@ -32,11 +42,19 @@
 
                         <span style="font-size: 1.25rem; width: 300px;">@participante.Nome</span>
 
-                        <form asp-controller="Grupos" asp-action="RemoverParticipante" method="post">
+                        <form id="form-delete-@participante.Id"
+                              asp-controller="Grupos"
+                              asp-action="RemoverParticipante"
+                              method="post"
+                              style="margin:0;">
+
                             <input type="hidden" name="grupoId" value="@Model.Id" />
                             <input type="hidden" name="usuarioId" value="@participante.Id" />
-                            <button type="submit" class="btn btn-danger"
-                                    style="border-width: 0.8px; border-radius: 12px;">
+
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    style="border-width: 0.8px; border-radius: 12px;"
+                                    onclick="confirmarExclusao(@participante.Id)">
                                 Remover
                             </button>
                         </form>
@@ -51,4 +69,20 @@
             </li>
         }
     </ul>
-</div>
+
+    <script>
+        function confirmarExclusao(usuarioId) {
+            if (confirm('Tem certeza que deseja remover este participante?')) {
+                document.getElementById('form-delete-' + usuarioId).submit();
+            }
+        }
+
+        @if (TempData["MensagemRemocao"] != null)
+        {
+                <text>
+                alert('@Html.Raw(TempData["MensagemRemocao"])');
+                </text>
+        }
+    </script>
+
+
