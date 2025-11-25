@@ -139,74 +139,69 @@ namespace SportConnect.Services
             }
         }
 
-        public async Task<bool> RemoveAndPromoteNextAsync(int grupoId, int usuarioId, CancellationToken ct = default)
+        public async Task PromoteNextIfVagaAsync(int grupoId, CancellationToken ct = default)
         {
             using var tx = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
             try
             {
-                var part = await _db.Participacoes
-                    .FirstOrDefaultAsync(p => p.GrupoId == grupoId && p.UsuarioId == usuarioId, ct);
 
-                if (part == null)
-                {
-                    await tx.RollbackAsync(ct);
-                    _logger.LogDebug("RemoveAndPromote: participação não encontrada para Usuario {UsuarioId} no Grupo {GrupoId}", usuarioId, grupoId);
-                    return false;
-                }
-
-                // Atualiza para cancelado
-                part.StatusParticipacao = StatusCancelado;
-                _db.Participacoes.Update(part);
-                await _db.SaveChangesAsync(ct);
-
-                // Verifica vagas disponíveis
                 var inscritos = await _db.Participacoes
                     .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusInscrito)
                     .CountAsync(ct);
 
                 var grupo = await _db.Grupos.FindAsync(new object[] { grupoId }, ct);
 
-                if (grupo != null && (grupo.NumeroMaximoParticipantes == 0 || inscritos < grupo.NumeroMaximoParticipantes))
+                if (grupo == null)
                 {
-                    var proximo = await _db.Participacoes
-                        .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusFila)
-                        .OrderBy(p => p.DataInscricao)
-                        .FirstOrDefaultAsync(ct);
-
-                    if (proximo != null)
-                    {
-                        proximo.StatusParticipacao = StatusInscrito;
-                        _db.Participacoes.Update(proximo);
-                        await _db.SaveChangesAsync(ct);
-
-                        await tx.CommitAsync(ct);
-
-                        try
-                        {
-                            if (_hub != null)
-                            {
-                                await _hub.Clients.User(proximo.UsuarioId.ToString())
-                                    .SendAsync("Promovido", new { GrupoId = grupoId, ParticipacaoId = proximo.Id }, ct);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, "Falha ao notificar usuario {UsuarioId} promovido no grupo {GrupoId}", proximo.UsuarioId, grupoId);
-                        }
-
-                        _logger.LogInformation("Promovido participante {ParticipacaoId} no grupo {GrupoId}", proximo.Id, grupoId);
-                        return true;
-                    }
+                    await tx.RollbackAsync(ct);
+                    return;
                 }
 
+                if (grupo.NumeroMaximoParticipantes > 0 && inscritos >= grupo.NumeroMaximoParticipantes)
+                {
+                    await tx.RollbackAsync(ct);
+                    return;
+                }
+
+
+                var proximo = await _db.Participacoes
+                    .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusFila)
+                    .OrderBy(p => p.DataInscricao)
+                    .FirstOrDefaultAsync(ct);
+
+
+                if (proximo == null)
+                {
+                    await tx.RollbackAsync(ct);
+                    return;
+                }
+
+                proximo.StatusParticipacao = StatusInscrito;
+                _db.Participacoes.Update(proximo);
+                await _db.SaveChangesAsync(ct);
                 await tx.CommitAsync(ct);
-                return false;
+                try
+                {
+                    if (_hub != null)
+                    {
+                        await _hub.Clients.User(proximo.UsuarioId.ToString())
+                            .SendAsync("Promovido", new { GrupoId = grupoId, ParticipacaoId = proximo.Id }, ct);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Falha ao notificar usuario {UsuarioId} promovido no grupo {GrupoId}", proximo.UsuarioId, grupoId);
+                }
+
+                _logger.LogInformation("Promovido participante {ParticipacaoId} no grupo {GrupoId} (background/manual)", proximo.Id, grupoId);
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro em RemoveAndPromoteNextAsync para grupo {GrupoId} usuario {UsuarioId}", grupoId, usuarioId);
+                _logger.LogError(ex, "Erro em PromoteNextIfVagaAsync para grupo {GrupoId}", grupoId);
                 try { await tx.RollbackAsync(ct); } catch { }
                 throw;
+
             }
         }
     }
