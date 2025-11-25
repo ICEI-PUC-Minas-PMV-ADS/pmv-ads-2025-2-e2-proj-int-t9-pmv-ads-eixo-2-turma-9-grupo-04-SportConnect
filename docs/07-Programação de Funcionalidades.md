@@ -1,43 +1,19 @@
 # Programação de Funcionalidades (INCLUIR A PROGRAMAÇAÕ DE FUNCIONALIDADE EM PROFUNDIDADE)
 
-<span style="color:red">Pré-requisitos: <a href="2-Especificação do Projeto.md"> Especificação do Projeto</a></span>, <a href="3-Projeto de Interface.md"> Projeto de Interface</a>, <a href="4-Metodologia.md"> Metodologia</a>, <a href="3-Projeto de Interface.md"> Projeto de Interface</a>, <a href="5-Arquitetura da Solução.md"> Arquitetura da Solução</a>
+| ID    | Descrição do Requisito                                                                                                                                       | Artefatos produzidos                                                                                                                    | Aluno(a) responsável |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| RF-01 | A aplicação deve permitir o cadastro de usuários                                                                                                             | UsuariosControllers.cs                                                                                                                  | Ayrton               |
+| RF-02 | A aplicação deve permitir o login de usuários, para assim ser possível o acesso ao sistema                                                                   | Login.cshtml, Editar.cshtml, AcessoNegado.cshtml, Cadastrar.cshtml, ConfirmarSenha.html, Detalhes.cshtml, Editar.cshtml, Sucesso.cshtml | Ayrton               |
+| RF-03 | A aplicação deve permitir a criação de grupos                                                                                                                | Index.cshtml, GruposControllers.cs                                                                                                      | Rafael               |
+| RF-04 | A aplicação deve permitir a entrada de usuários em grupos                                                                                                    | Index.cshtml: Grupos                                                                                                                    | Rafael               |
+| RF-05 | A aplicação deve permitir a pesquisa de grupos, seja por nome, localidade ou modalidade                                                                      | Index.cshtml: Grupos                                                                                                                    | Ayrton               |
+| RF-06 | A aplicação deve permitir que o usuário saia de um grupo em que ele é participante                                                                           | index.cshtml:Grupo, Grupos.Controllers.cs                                                                                               | Rafael               |
+| RF-07 | A aplicação deve permitir que o usuário administrador de um grupo cadastre uma atividade no grupo em que ele gere                                            | Create.cshtml, Edit.cshtml                                                                                                              | Igor                 |
+| RF-08 | A aplicação deve permitir que o usuário receba notificações sobre novas atividades adicionadas aos grupos onde o mesmo participa                             | NotificacaoController.cs,Notificacao.Cs                                                                                                                                        | Jean                 |
+| RF-09 | A aplicação deve permitir que o usuário consulte todos os grupos em que ele participa                                                                        | index.cshtml, ListaEsperaServices.cs                                                                                                    | Ayrton               |
+| RF-10 | A aplicação deve permitir que o usuário consulte todos os grupos em que ele é administrador                                                                  | index.cshtml                                                                                                                            | Ayrton               |
+| RF-11 | A aplicação deve permitir que o usuário entre em uma lista de espera caso o grupo atinja sua capacidade máxima e o administrador tenha habilitado essa opção | Index.Cshtml, ListaEspera.cs                                                                                                            | Jean                 |
+| RF-12 | A aplicação deve permitir que o administrador de um grupo faça o download de um PDF contendo todos os participantes do grupo em que o mesmo gere             | GerenciarParticipantes.Cshtml                                                                                                           | Lívia                |
+| RF-13 | A aplicação deve permitir que o administrador remova participantes de seu grupo                                                                              | GerenciarParticipantes.Cshtml                                                                                                           | Lívia                |
+| RF-14 | A aplicação deve permitir que um usuário participante de um grupo consulte o endereço de uma atividade por meio de um mapa                                   | Create.cshtml, index.html, Eventos.Controllers                                                                                          | Igor                 |
 
-Nesta seção, a implementação do sistema descrita por meio dos requisitos funcionais e/ou não funcionais. Nesta seção, é essencial relacionar os requisitos atendidos com os artefatos criados (código fonte) e com o(s) responsável(is) pelo desenvolvimento de cada artefato a cada etapa. Nesta seção também deverão ser apresentadas, se necessário, as instruções para acesso e verificação da **implementação que deve estar funcional no ambiente de hospedagem, OBRIGATORIAMENTE, a partir da Etapa 03**.
-
-**O que DEVE ser utilizado para o desenvolvimento da aplicação:**
-- Microsoft Visual Studio (IDE de Codificação)
-- HTML e CSS (frontend)
-- Javascript (frontend)
-- C# (backend)
-- MySQL ou SQLServer(Base de Dados)
-- Bootstrap (template responsivo para frontend)
-- Github (documentação e controle de versão)
-
-**O que NÃO PODE ser utilizado:**
-- Template React (e qualquer outro template - exceto o Bootstrap)
-- Qualquer outra liguagem de programação diferente de C#
-
-A tabela a seguir é um exemplo de como ela deverá ser preenchida considerando os artefatos desenvolvidos.
-
-|ID    | Descrição do Requisito  | Artefatos produzidos | Aluno(a) responsável |
-|------|-----------------------------------------|----|----|
-|RF-001| A aplicação deve permitir que o usuário avalie uma agência de intercâmbio com base na sua experiência| |  |
-|RF-002| A aplicação deve permitir que o usuário inclua comentários ao fazer uma avaliação de uma agência de intercâmbio     |  |  |
-|RF-003| A aplicação deve permitir que o usuário consulte todas as agências de intercâmbio cadastradas ordenando-as com base em suas notas |  |  |
-
-
-# Instruções de acesso
-
-Não deixe de informar o link onde a aplicação estiver disponível para acesso (por exemplo: https://adota-pet.herokuapp.com/src/index.html).
-
-Se houver usuário de teste, o login e a senha também deverão ser informados aqui (por exemplo: usuário - admin / senha - admin).
-
-O link e o usuário/senha descritos acima são apenas exemplos de como tais informações deverão ser apresentadas.
-
-> **Links Úteis**:
->
-> - [Trabalhando com HTML5 Local Storage e JSON](https://www.devmedia.com.br/trabalhando-com-html5-local-storage-e-json/29045)
-> - [JSON Tutorial](https://www.w3resource.com/JSON)
-> - [JSON Data Set Sample](https://opensource.adobe.com/Spry/samples/data_region/JSONDataSetSample.html)
-> - [JSON - Introduction (W3Schools)](https://www.w3schools.com/js/js_json_intro.asp)
-> - [JSON Tutorial (TutorialsPoint)](https://www.tutorialspoint.com/json/index.htm)

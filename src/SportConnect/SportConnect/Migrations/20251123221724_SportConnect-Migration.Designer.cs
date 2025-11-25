@@ -12,8 +12,8 @@ using SportConnect.Models;
 namespace SportConnect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251115150716_add-modalidades03")]
-    partial class addmodalidades03
+    [Migration("20251123221724_SportConnect-Migration")]
+    partial class SportConnectMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -85,11 +85,14 @@ namespace SportConnect.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CriadorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GrupoId")
+                    b.Property<int>("GrupoId")
                         .HasColumnType("int");
 
                     b.Property<double?>("Latitude")
@@ -109,14 +112,11 @@ namespace SportConnect.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UsuarioId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("GrupoId");
+                    b.HasIndex("CriadorId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("GrupoId");
 
                     b.ToTable("Eventos");
                 });
@@ -365,7 +365,7 @@ namespace SportConnect.Migrations
                         new
                         {
                             Id = 46,
-                            Nome = "Iatismo"
+                            Nome = "Iatismo/Vela"
                         },
                         new
                         {
@@ -380,13 +380,38 @@ namespace SportConnect.Migrations
                         new
                         {
                             Id = 49,
-                            Nome = "Breakdance"
+                            Nome = "Dança Esportiva"
                         },
                         new
                         {
                             Id = 50,
                             Nome = "Xadrez"
                         });
+                });
+
+            modelBuilder.Entity("SportConnect.Models.Notificacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("DataEnvio")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Lida")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Mensagem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notificacoes");
                 });
 
             modelBuilder.Entity("SportConnect.Models.Participacao", b =>
@@ -396,6 +421,9 @@ namespace SportConnect.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("DataInscricao")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("GrupoId")
                         .HasColumnType("int");
@@ -456,25 +484,42 @@ namespace SportConnect.Migrations
             modelBuilder.Entity("CriarGrupo.Models.Grupo", b =>
                 {
                     b.HasOne("SportConnect.Models.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId");
+                        .WithMany("Grupos")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("SportConnect.Models.Evento", b =>
                 {
-                    b.HasOne("CriarGrupo.Models.Grupo", "Grupo")
-                        .WithMany()
-                        .HasForeignKey("GrupoId");
+                    b.HasOne("SportConnect.Models.Usuario", "Criador")
+                        .WithMany("EventosCriados")
+                        .HasForeignKey("CriadorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("CriarGrupo.Models.Grupo", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId");
+                    b.HasOne("CriarGrupo.Models.Grupo", "Grupo")
+                        .WithMany("Eventos")
+                        .HasForeignKey("GrupoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Criador");
 
                     b.Navigation("Grupo");
+                });
 
-                    b.Navigation("Usuario");
+            modelBuilder.Entity("CriarGrupo.Models.Grupo", b =>
+                {
+                    b.Navigation("Eventos");
+                });
+
+            modelBuilder.Entity("SportConnect.Models.Usuario", b =>
+                {
+                    b.Navigation("EventosCriados");
+
+                    b.Navigation("Grupos");
                 });
 #pragma warning restore 612, 618
         }

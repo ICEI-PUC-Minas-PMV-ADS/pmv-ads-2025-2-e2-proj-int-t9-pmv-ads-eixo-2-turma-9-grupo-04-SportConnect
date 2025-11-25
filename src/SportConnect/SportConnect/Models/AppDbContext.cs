@@ -17,6 +17,7 @@ namespace SportConnect.Models
 
         public DbSet<Modalidade> Modalidades { get; set; }
 
+        public DbSet<Notificacao> Notificacoes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

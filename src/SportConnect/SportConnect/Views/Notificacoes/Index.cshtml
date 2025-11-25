@@ -1,0 +1,89 @@
+﻿@model IEnumerable<SportConnect.Models.Notificacao>
+
+
+
+@{
+
+    ViewData["Title"] = "Index";
+
+}
+
+
+
+@section HeadStyles {
+
+    <style>
+
+        td {
+            border-color: black;
+            justify-content: center;
+        }
+
+
+
+        @@media (max-width: 1160px) {
+
+            #content {
+                margin: 0px 200px 0px 200px !important;
+            }
+        }
+
+
+
+        @@media (max-width: 940px) {
+
+            #content {
+                margin: 0px 100px 0px 100px !important;
+            }
+        }
+
+
+
+        @@media (max-width: 620px) {
+
+            #content {
+                margin: 0px 0px 0px 0px !important;
+                border: none !important;
+            }
+        }
+    </style>
+
+}
+
+
+
+<div id="content" style="border: 1px solid black; border-top: none; border-bottom: 0px; margin: 0px 300px 0px 300px; min-height: 100%; height: 100%">
+
+    <table class="table">
+
+        <tbody>
+
+            @foreach (var item in Model)
+
+            {
+
+                <tr style="vertical-align: middle; height: 70px; width: 100% !important">
+
+                    <td style="padding-left: 16px;">
+
+                        <i style="font-size: 20px; margin-right: 4px" class="fa-solid fa-arrow-right-to-bracket"></i>
+
+                        @Html.DisplayFor(modelItem => item.Mensagem)
+
+                    </td>
+
+                    <td style="padding-right: 16px; text-align: end">
+
+                        @item.DataEnvio.Day/@item.DataEnvio.Month/@item.DataEnvio.Year
+
+                    </td>
+
+                </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

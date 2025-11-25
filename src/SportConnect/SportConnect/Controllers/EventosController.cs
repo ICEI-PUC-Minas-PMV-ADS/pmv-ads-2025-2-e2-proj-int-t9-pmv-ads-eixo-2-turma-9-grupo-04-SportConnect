@@ -51,6 +51,11 @@ namespace SportConnect.Controllers
 
             ViewBag.CriadorDoGrupoId = grupo.UsuarioId;
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             return View("Eventos", eventos);
         }
 
@@ -69,6 +74,12 @@ namespace SportConnect.Controllers
             var model = new Evento { GrupoId = grupoId };
 
             ViewBag.GrupoId = grupoId;
+
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             return View(model);
         }
 
@@ -115,6 +126,11 @@ namespace SportConnect.Controllers
             var userId = GetCurrentUserId();
             if (evento.CriadorId != userId) return Forbid();
 
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
             return View(evento);
         }
 
@@ -132,10 +148,14 @@ namespace SportConnect.Controllers
             // atualiza campos
             original.Nome = evento.Nome;
             original.Descricao = evento.Descricao;
-            
+            original.Cidade = evento.Cidade;
+            original.Bairro = evento.Bairro;
+            original.Rua = evento.Rua;
+            original.Numero = evento.Numero;
+
 
             // string enderecoCompleto = $"{evento.Rua}, {evento.Numero}, {evento.Bairro}, {evento.Cidade}";
-            var enderecoCompleto = $"{evento.Rua}, ${evento.Numero}, ${evento.Bairro},${evento.Cidade},MG, Brasil"; 
+            var enderecoCompleto = $"{evento.Rua}, ${evento.Numero}, ${evento.Bairro},${evento.Cidade},MG, Brasil";
             var (lat, lng) = await GetCoordinatesFromOpenCage(enderecoCompleto);
 
             original.Latitude = lat;
@@ -155,6 +175,11 @@ namespace SportConnect.Controllers
 
             var userId = GetCurrentUserId();
             if (evento.CriadorId != userId) return Forbid();
+
+            var notificacoesNaoLidas = _context.Notificacoes
+                    .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
+
+            ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
 
             return View(evento);
         }

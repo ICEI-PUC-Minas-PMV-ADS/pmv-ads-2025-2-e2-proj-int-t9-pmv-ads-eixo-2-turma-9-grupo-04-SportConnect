@@ -386,6 +386,31 @@ namespace SportConnect.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SportConnect.Models.Notificacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("DataEnvio")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Lida")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Mensagem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notificacoes");
+                });
+
             modelBuilder.Entity("SportConnect.Models.Participacao", b =>
                 {
                     b.Property<int>("Id")

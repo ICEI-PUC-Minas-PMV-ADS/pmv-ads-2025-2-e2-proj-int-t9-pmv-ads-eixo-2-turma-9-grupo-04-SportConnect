@@ -12,6 +12,14 @@
 
 @section HeadStyles {
     <style>
+        #content{
+            margin-top: 50px !important;
+        }
+
+        #cards-section{
+            padding-bottom: 50px;
+        }
+
         .formComponents{
             width: 230px;
             margin-left: 20px;
@@ -30,13 +38,15 @@
         @@media(max-width: 1380px){
             .filtroData {
                 flex-direction: column;
+                align-items: center;
                 margin-bottom: 30px;
             }
 
             .formComponents {
-                width: 350px;
+                width: 500px;
                 font-size: 15px;
                 margin-top: 20px;
+                margin-left: 0px;
             }
 
             .formComponents {
@@ -54,7 +64,82 @@
 
             #btnSubmit{
                 text-align: center;
-                width: 350px;
+                width: 500px;
+                margin-left: 0px !important;
+            }
+
+            .gruposFilter{
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            #gruposParticipo{
+                width: 500px;
+                margin-bottom: 20px;
+                margin-left: 0px;
+                font-size: 15px !important;
+            }
+
+            #gruposDono{
+                width: 500px;
+                font-size: 15px !important;
+            }
+
+            #createGrupo{
+                width: 500px;
+                margin-left: 0px;
+                font-size: 15px !important;
+                padding-bottom: 8px !important;
+                padding-top: 8px !important;
+            }
+
+            .grupoFilterChild{
+                margin-left: 0px !important;
+            }
+
+            #content{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 50px;
+                margin-left: 0px !important;
+            }
+
+            #changeText{
+                margin-left: 8px !important;
+            }
+
+            #changeSelect{
+                margin-left: 8px !important;
+            }
+        }
+
+        @@media (max-width: 575px){
+            .filtroData, #filtro{
+                width: 100% !important;
+            }
+
+            .formComponents {
+                width: 100% !important;
+            }
+
+            #modalidade-section{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .grupoFilterChild, #gruposParticipo, #gruposDono, #createGrupo, #btnSubmit {
+                width: 100% !important;
+            }
+
+            .gruposFilter > p{
+                width: 100%;
+            }
+
+            #content{
+                padding: 0px 20px 0px 20px !important;
             }
         }
     </style>
@@ -68,7 +153,7 @@
     </p>
 </div>
 
-<div style="margin-left: 20px; margin-top: 30px">
+<div id="content" style="margin-left: 20px; margin-top: 30px">
     <form style="display: flex; flex-direction: column; justify-content: center;" id="filtro" asp-controller="Grupos" asp-action="Filtro">
         <div class="filtroData" style="display: flex">
             @if (ViewData["Nome"] != null)
@@ -157,12 +242,16 @@
                 @if (ViewData["Text"] != null)
                 {
                     <input value="@Html.Raw(ViewData["Modalidade"])" class="form-control formComponents" placeholder="Pesquisar modalidade" name="modalidade" id="modalidade" type="text" />
-                    <p id="changeSelect" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Voltar</p>
+                    <div style="width: 100%">
+                        <p id="changeSelect" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Voltar</p>
+                    </div>
                 }
                 @if(ViewData["Text"] == null)
                 {
                     @Html.DropDownList("modalidade", (IEnumerable<SelectListItem>)ViewBag.Modalidades, new { @class = "form-control formComponents" })
-                    <p id="changeText" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Não encontrou?</p>
+                    <div style="width: 100%">
+                        <p id="changeText" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Não encontrou?</p>
+                    </div>
                 }
             </div>
 
@@ -208,8 +297,8 @@
 
         @if (User.Identity.IsAuthenticated)
         {
-            <div style="display: flex; align-items: center;">
-                <div style="margin-left: 20px">
+            <div class="gruposFilter" style="display: flex; align-items: center;">
+                <div class="grupoFilterChild" style="margin-left: 20px">
                     @if (ViewData["GruposParticipo"] == null)
                     {
                         <a onclick="handleClick(event)" id="gruposParticipo" class="btn" style="border: solid 1px #ced4da; border-radius: 10px; font-size: 16px; font-weight: 400; padding: 5px 25px 5px 25px">Ver grupos em que participo</a>
@@ -220,7 +309,7 @@
                     }
                 </div>
 
-                <div style="margin-left: 20px">
+                <div class="grupoFilterChild" style="margin-left: 20px">
                     @if (ViewData["GruposDono"] == null)
                     {
                         <a onclick="handleClick(event)" id="gruposDono" class="btn" style="border: solid 1px #ced4da; border-radius: 10px; font-size: 16px; font-weight: 400; padding: 5px 25px 5px 25px">Ver grupos em que administro</a>
@@ -232,7 +321,7 @@
                 </div>
 
                 <p>
-                    <a asp-action="Create" class="btn btn-primary btn-criar" style="border-radius: 10px; font-size: 16px; font-weight: 600; padding: 5px 25px 5px 25px">Criar novo grupo</a>
+                    <a asp-action="Create" id="createGrupo" class="btn btn-primary btn-criar" style="border-radius: 10px; font-size: 16px; font-weight: 600; padding: 5px 25px 5px 25px">Criar novo grupo</a>
                 </p>
             </div>
         }
@@ -284,6 +373,7 @@
                         @if (jaParticipa)
                         {
                             @* ✅ Usuário já inscrito: mostra "Participando" (verde), Visualizar e Sair *@
+                                <a href="@Url.Action("Index", "Eventos", new { grupoId = @item.Id })" class="btn btn-primary btn-custom">Eventos</a>
                             <button type="button" class="btn btn-success btn-custom" disabled>Participando</button>
 
                             <form asp-action="Sair" asp-route-id="@item.Id" method="post" class="d-inline">
@@ -528,7 +618,10 @@
         if(e.target.id == "changeText"){
             htmlContent = `
                 <input class="form-control formComponents" placeholder="Pesquisar modalidade" name="modalidade" id="modalidade" type="text" />
-                <p id="changeSelect" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Voltar</p>
+                
+                <div style="width: 100%">
+                    <p id="changeSelect" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Voltar</p>
+                </div>
             `
             section.innerHTML = htmlContent
         }
@@ -589,7 +682,9 @@
                     <option>Xadrez</option>
                 </select>
 
-                <p id="changeText" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Não encontrou?</p>
+                <div style="width: 100%">
+                    <p id="changeText" onclick="changeInput(event)" style="margin-left: 28px; color: #007bff; cursor: pointer">Não encontrou?</p>
+                </div>
             `
             section.innerHTML = htmlContent
         }

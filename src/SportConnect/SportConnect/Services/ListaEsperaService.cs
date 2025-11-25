@@ -106,6 +106,13 @@ namespace SportConnect.Services
                     {
                         proximo.StatusParticipacao = StatusInscrito;
                         _db.Participacoes.Update(proximo);
+                        _db.Notificacoes.Add(new Notificacao
+                        {
+                            UsuarioId = proximo.UsuarioId,
+                            Mensagem = $"Você entrou no grupo {grupo.Nome} pela lista de espera!",
+                            DataEnvio = DateTimeOffset.UtcNow,
+                            Lida = "Nao"
+                        });
                         await _db.SaveChangesAsync(ct);
 
                         await tx.CommitAsync(ct);
@@ -144,7 +151,6 @@ namespace SportConnect.Services
             using var tx = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
             try
             {
-
                 var inscritos = await _db.Participacoes
                     .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusInscrito)
                     .CountAsync(ct);
@@ -163,12 +169,10 @@ namespace SportConnect.Services
                     return;
                 }
 
-
                 var proximo = await _db.Participacoes
                     .Where(p => p.GrupoId == grupoId && p.StatusParticipacao == StatusFila)
                     .OrderBy(p => p.DataInscricao)
                     .FirstOrDefaultAsync(ct);
-
 
                 if (proximo == null)
                 {
@@ -180,6 +184,7 @@ namespace SportConnect.Services
                 _db.Participacoes.Update(proximo);
                 await _db.SaveChangesAsync(ct);
                 await tx.CommitAsync(ct);
+
                 try
                 {
                     if (_hub != null)
@@ -194,14 +199,12 @@ namespace SportConnect.Services
                 }
 
                 _logger.LogInformation("Promovido participante {ParticipacaoId} no grupo {GrupoId} (background/manual)", proximo.Id, grupoId);
-
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro em PromoteNextIfVagaAsync para grupo {GrupoId}", grupoId);
                 try { await tx.RollbackAsync(ct); } catch { }
                 throw;
-
             }
         }
     }
