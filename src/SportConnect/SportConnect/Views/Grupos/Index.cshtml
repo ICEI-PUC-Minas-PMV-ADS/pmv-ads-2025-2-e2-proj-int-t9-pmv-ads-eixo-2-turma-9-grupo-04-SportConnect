@@ -337,6 +337,8 @@
 }
 
 <div class="container" style="margin-top: 50px">
+    <p style="font-size: 20px; text-align: center; margin-top: 60px">@Html.Raw(ViewData["Nulo"])</p>
+
     <div id="cards-section" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
     @foreach (var item in Model)
     {
@@ -359,7 +361,7 @@
                     @if (ehDono)
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Editar</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Visualizar</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-custom">Gerenciar</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-custom">Excluir Grupo</a>
                         <a href="@Url.Action("Index", "Eventos", new{grupoId=@item.Id})" class="btn btn-primary btn-custom">Eventos</a>
                     }

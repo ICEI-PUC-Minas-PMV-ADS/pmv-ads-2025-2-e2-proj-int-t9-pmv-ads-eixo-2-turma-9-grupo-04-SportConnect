@@ -27,17 +27,24 @@ namespace SportConnect.Controllers
                 return Forbid();
             }
 
-            var notificacoes = await _context.Notificacoes.Where(x => x.UsuarioId == id).OrderBy(x => x.DataEnvio).ToListAsync();
+            var notificacoes = await _context.Notificacoes.Where(x => x.UsuarioId == id).OrderByDescending(x => x.DataEnvio).ToListAsync();
 
-            foreach (var notificacao in notificacoes)
+            if(notificacoes.Count() == 0)
             {
-                if (notificacao.Lida == "Nao")
-                {
-                    notificacao.Lida = "Sim";
-                }
+                ViewBag.Nulo = "Não há notificações no momento";
             }
+            else
+            {
+                foreach (var notificacao in notificacoes)
+                {
+                    if (notificacao.Lida == "Nao")
+                    {
+                        notificacao.Lida = "Sim";
+                    }
+                }
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+            }   
 
             return View(notificacoes);
         }

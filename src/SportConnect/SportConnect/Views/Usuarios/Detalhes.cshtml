@@ -47,22 +47,22 @@
 
 <div id="content" style="padding-left: 80px; padding-top: 100px">
     <div>
-        <h1 style="font-size: 50px">Perfil</h1>
+        <h1 style="font-size: 45px">Perfil</h1>
         <div style="margin-top: 30px">
-            <p style="font-size: 20px">@Html.DisplayNameFor(model => model.Nome):  @Html.DisplayFor(model => model.Nome)</p>
-            <p style="font-size: 20px">@Html.DisplayNameFor(model => model.Cpf):  @Html.DisplayFor(model => model.Cpf)</p>
-            <p style="font-size: 20px">@Html.DisplayNameFor(model => model.Email):  @Html.DisplayFor(model => model.Email)</p>
-            <p style="font-size: 20px">@Html.DisplayNameFor(model => model.DataDeNascimento):  @Html.DisplayFor(model => model.DataDeNascimento)</p>
-            <p style="font-size: 20px">@Html.DisplayNameFor(model => model.Estado):  @Html.DisplayFor(model => model.Estado)</p>
-            <p style="font-size: 20px">@Html.DisplayNameFor(model => model.Cidade):  @Html.DisplayFor(model => model.Cidade)</p>
+            <p style="font-size: 18px">@Html.DisplayNameFor(model => model.Nome):  @Html.DisplayFor(model => model.Nome)</p>
+            <p style="font-size: 18px">@Html.DisplayNameFor(model => model.Cpf):  @Html.DisplayFor(model => model.Cpf)</p>
+            <p style="font-size: 18px">@Html.DisplayNameFor(model => model.Email):  @Html.DisplayFor(model => model.Email)</p>
+            <p style="font-size: 18px">@Html.DisplayNameFor(model => model.DataDeNascimento):  @Html.DisplayFor(model => model.DataDeNascimento)</p>
+            <p style="font-size: 18px">@Html.DisplayNameFor(model => model.Estado):  @Html.DisplayFor(model => model.Estado)</p>
+            <p style="font-size: 18px">@Html.DisplayNameFor(model => model.Cidade):  @Html.DisplayFor(model => model.Cidade)</p>
         </div>
 
         <div id="btns" style="display: flex; margin-top: 50px">
             <a style="margin-right: 15px" asp-action="Editar" asp-route-id="@Model?.Id">
-                <input type="submit" value="Editar" class="btn btn-primary" style="border-radius: 10px; font-size: 18px; font-weight: 600; padding: 8px 40px 8px 40px" />
+                <input type="submit" value="Editar" class="btn btn-primary" style="border-radius: 10px; font-size: 17px; font-weight: 600; padding: 8px 30px 8px 30px" />
             </a>
 
-            <input type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" id="delete" type="submit" value="Excluir Conta" class="btn btn-danger" style="border-radius: 10px; font-size: 18px; font-weight: 600; padding: 8px 30px 8px 30px" />
+            <input type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" id="delete" type="submit" value="Excluir Conta" class="btn btn-danger" style="border-radius: 10px; font-size: 17px; font-weight: 600; padding: 8px 30px 8px 30px" />
         </div>
 
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

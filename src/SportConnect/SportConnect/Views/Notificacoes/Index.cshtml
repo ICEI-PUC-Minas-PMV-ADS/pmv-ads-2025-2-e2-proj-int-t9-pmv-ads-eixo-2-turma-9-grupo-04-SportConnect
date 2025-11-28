@@ -1,13 +1,10 @@
 ﻿@model IEnumerable<SportConnect.Models.Notificacao>
 
-
-
 @{
 
     ViewData["Title"] = "Index";
 
 }
-
 
 
 @section HeadStyles {
@@ -50,18 +47,18 @@
 
 }
 
-
-
 <div id="content" style="border: 1px solid black; border-top: none; border-bottom: 0px; margin: 0px 300px 0px 300px; min-height: 100%; height: 100%">
-
+    <i onclick="history.back()" id="arrow" style="font-size: 30px; color: #212529; cursor: pointer; margin: 20px 16px 10px 16px" class="fa-solid fa-arrow-left"></i>
+    
+    @if (ViewData["Nulo"] != null){
+    
+        <p style="margin-left:20px; margin-right: 20px; font-size: 20px; text-align: center; padding-top: 60px">@Html.Raw(ViewData["Nulo"])</p>
+    }
+   
     <table class="table">
-
         <tbody>
-
             @foreach (var item in Model)
-
             {
-
                 <tr style="vertical-align: middle; height: 70px; width: 100% !important">
 
                     <td style="padding-left: 16px;">
@@ -79,11 +76,7 @@
                     </td>
 
                 </tr>
-
             }
-
         </tbody>
-
     </table>
-
 </div>

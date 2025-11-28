@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SportConnect.Controllers
 {
@@ -730,6 +731,11 @@ namespace SportConnect.Controllers
                     .Count(x => x.UsuarioId == GetCurrentUserId() && x.Lida == "Nao");
 
             ViewBag.NotificacoesCount = notificacoesNaoLidas.ToString();
+
+            if(dados.Count() == 0)
+            {
+                ViewBag.Nulo = "Grupo não encontrado";
+            }
 
             return View("~/Views/Grupos/Index.cshtml", dados);
         }

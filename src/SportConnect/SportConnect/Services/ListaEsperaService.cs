@@ -110,7 +110,7 @@ namespace SportConnect.Services
                         {
                             UsuarioId = proximo.UsuarioId,
                             Mensagem = $"Você entrou no grupo {grupo.Nome} pela lista de espera!",
-                            DataEnvio = DateTimeOffset.UtcNow,
+                            DataEnvio = DateTimeOffset.UtcNow.AddHours(-3),
                             Lida = "Nao"
                         });
                         await _db.SaveChangesAsync(ct);
