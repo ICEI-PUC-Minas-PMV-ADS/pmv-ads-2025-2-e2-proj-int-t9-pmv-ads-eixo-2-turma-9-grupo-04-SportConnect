@@ -43,6 +43,10 @@
             opacity: 1 !important;
         }
 
+        .offcanvas{
+            border: none;
+        }
+
         @@media (max-width: 830px) {
             .nav-item {
                 font-size: 14px;
@@ -65,6 +69,20 @@
             #navBar {
                 display: none !important;
             }
+
+            .btnNav{
+                font-size: 16px !important;
+                border: none !important;
+                background-color: transparent;
+                color: white;
+                margin: 0px !important;
+                padding: 0.375rem 0px 0.375rem 0px;
+            }
+
+            .btnNav:hover {
+                background-color: transparent !important;
+                color: white;
+            }
         }
 
         @@media (max-width: 600px) {
@@ -81,7 +99,7 @@
 </head>
 <body class="m-0">
     <header>
-        <nav style="background-color: #09264A; height: 100px; padding: 0px 30px 0px 30px" class="navbar navbar-expand-md navbar-toggleable-md navbar-light border-bottom box-shadow">
+        <nav style="background-color: #09264A; height: 100px; padding: 0px 30px 0px 30px; border: none !important" class="navbar navbar-expand-md navbar-toggleable-md navbar-light border-bottom box-shadow">
             <div style="height: 100%; display: flex; justify-content: space-between; width: 100%;">
                 <div style="display: flex; align-items: center;">
                     @{
@@ -92,7 +110,7 @@
                     <a asp-area="" asp-controller="@(User.Identity.IsAuthenticated && ((controller == "Usuarios" && (action == "Editar" || action == "Excluir" || action == "Detalhes")) || (controller != "Usuarios" && controller != "Home")) ? "Grupos" : "Home")" asp-action="Index">
                         <img id="logo" style="height: 60px; margin-right: 10px" src="~/images/logo.png" />
                     </a>
-                    <a style="color: white; padding: 8px 0px 8px 0px !important; margin: 0px !important" class="navbar-brand" asp-area="" asp-controller="@(User.Identity.IsAuthenticated && ((controller == "Usuarios" && (action == "Editar" || action == "Excluir" || action == "Detalhes")) || (controller != "Usuarios" && controller != "Home")) ? "Grupos" : "Home")" asp-action="Index">SportConnect</a>
+                    <a style="font-weight: normal; color: white; padding: 8px 0px 8px 0px !important; margin: 0px !important" class="navbar-brand" asp-area="" asp-controller="@(User.Identity.IsAuthenticated && ((controller == "Usuarios" && (action == "Editar" || action == "Excluir" || action == "Detalhes")) || (controller != "Usuarios" && controller != "Home")) ? "Grupos" : "Home")" asp-action="Index">SportConnect</a>
                 </div>
 
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -108,22 +126,19 @@
                             @if ((controller == "Grupos" && (action == "Index" || action == "Filtro") && !User.Identity.IsAuthenticated) || controller == "Home" || (controller == "Usuarios" && (action == "Login" || action == "Cadastrar" || action == "AlterarSenha" || action == "ConfirmarSenha" || action == "Sucesso")))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                    <a style="margin: 0px 10px 0px 5px;" class="btnNav btn btn-outline-light" asp-controller="Grupos" asp-action="Index" role="button">
+                                        <i class="fas fa-search me-1"></i>Ver Grupos
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link text-white">Sobre Nós</a>
+                                    <a style="margin: 0px 10px 0px 0px;" class="btnNav btn btn-outline-light" asp-controller="Usuarios" asp-action="Login" role="button">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link text-white">Contato</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="Grupos" asp-action="Index">Ver Grupos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Cadastrar">Cadastre-se</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Login">Login</a>
+                                    <a class="btnNav btn btn-light" asp-controller="Usuarios" asp-action="Cadastrar" role="button">
+                                        <i class="fas fa-user-plus me-2"></i>Registrar
+                                    </a>
                                 </li>
                             }
 

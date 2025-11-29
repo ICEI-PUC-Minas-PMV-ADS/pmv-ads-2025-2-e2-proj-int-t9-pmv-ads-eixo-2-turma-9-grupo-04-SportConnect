@@ -12,8 +12,8 @@ using SportConnect.Models;
 namespace SportConnect.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251129013059_NovaMigration")]
-    partial class NovaMigration
+    [Migration("20251129014834_sportconnect-migration")]
+    partial class sportconnectmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
