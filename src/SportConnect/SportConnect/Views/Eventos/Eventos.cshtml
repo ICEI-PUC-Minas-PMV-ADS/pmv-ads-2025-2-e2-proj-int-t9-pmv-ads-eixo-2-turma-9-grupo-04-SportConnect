@@ -88,7 +88,12 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">@item.Nome</h5>
-                        <p class="card-text">@item.Descricao</p>
+                        <p class="card-text">
+                            <strong>Descrição: </strong>@item.Descricao
+                        </p>
+                        <p class="card-text">
+                            <strong>Data e Horário: </strong>@item.DataEvento.ToString("dd/MM/yyyy HH:mm")
+                        </p>
                         <p class="card-text">
                             <strong>Endereço:</strong> @item.Rua,
                             @item.Numero - @item.Bairro, @item.Cidade
