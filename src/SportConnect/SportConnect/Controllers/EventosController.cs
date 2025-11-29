@@ -152,6 +152,7 @@ namespace SportConnect.Controllers
             original.Bairro = evento.Bairro;
             original.Rua = evento.Rua;
             original.Numero = evento.Numero;
+            original.DataEvento = evento.DataEvento;
 
 
             // string enderecoCompleto = $"{evento.Rua}, {evento.Numero}, {evento.Bairro}, {evento.Cidade}";
