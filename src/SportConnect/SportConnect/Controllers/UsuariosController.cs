@@ -44,12 +44,20 @@ namespace SportConnect.Controllers
 
                 if (dados == null)
                 {
-                    usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
-                    usuario.Cpf = usuario.Cpf.Replace(".", "").Replace("-", "");
-                    _context.Usuarios.Add(usuario);
-                    await _context.SaveChangesAsync();
+                    if (usuario.DataDeNascimento > DateOnly.FromDateTime(DateTime.Now))
+                    {
+                        ViewBag.Message = "Data inválida!";
+                    }
 
-                    return RedirectToAction("Login");
+                    else
+                    {
+                        usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
+                        usuario.Cpf = usuario.Cpf.Replace(".", "").Replace("-", "");
+                        _context.Usuarios.Add(usuario);
+                        await _context.SaveChangesAsync();
+
+                        return RedirectToAction("Login");
+                    }
                 }
                 else
                 {
