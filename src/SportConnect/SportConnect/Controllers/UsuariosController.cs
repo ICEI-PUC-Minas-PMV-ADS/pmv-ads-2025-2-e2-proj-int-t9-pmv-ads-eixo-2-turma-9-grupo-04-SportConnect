@@ -40,6 +40,7 @@ namespace SportConnect.Controllers
                     return NotFound();
                 }
 
+                usuario.Cpf = usuario.Cpf.Replace(".", "").Replace("-", "");
                 var dados = _context.Usuarios.FirstOrDefault(c => c.Email == usuario.Email || c.Cpf == usuario.Cpf);
 
                 if (dados == null)
@@ -52,7 +53,6 @@ namespace SportConnect.Controllers
                     else
                     {
                         usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
-                        usuario.Cpf = usuario.Cpf.Replace(".", "").Replace("-", "");
                         _context.Usuarios.Add(usuario);
                         await _context.SaveChangesAsync();
 
