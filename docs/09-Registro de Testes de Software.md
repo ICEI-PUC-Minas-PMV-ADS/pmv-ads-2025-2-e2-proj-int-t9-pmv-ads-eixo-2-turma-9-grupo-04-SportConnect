@@ -54,12 +54,7 @@
 
 ## Relatório de testes de software
 
-A equipe de testes focou na avaliação nos requisitos funcionais já implementados: o cadastro de usuários (RF-01), o login (RF-02) e a criação de grupos (RF-03). Os demais requisitos do projeto ainda não foram desenvolvidos e, por isso, não foram avaliados.
-De modo geral, os testes realizados apresentaram um desempenho positivo, confirmando que o sistema atende às necessidades principais de acesso e gerenciamento inicial de grupos. As funções de cadastro e login (RF-01 e RF-02) funcionaram corretamente, e a validação dos dados obrigatórios está em conformidade. Além disso, a funcionalidade de criação de grupos (RF-03) foi executada sem falhas.
-A consulta dos grupos administrados também teve um desempenho satisfatório, exibindo os grupos vinculados ao perfil do usuário. Em relação à facilidade de uso, o design da interface é simples e direto, facilitando a utilização.
-
-Apesar dos resultados positivos, os testes mostraram falhas que exigem atenção, especialmente nas áreas de segurança e na experiência do usuário. 
-No quesito segurança, foi identificada a ausência de um limite de tentativas de login mal-sucedidas. Isso torna o sistema vulnerável a ataques que tentam descobrir a senha por repetição. Outra falha grave está no processo de recuperação de senha: o sistema permite a troca apenas com a inserção do e-mail, sem exigir uma confirmação adicional (como um código de segurança), o que representa um altíssimo risco de acesso não autorizado.
-Quanto à usabilidade, as mensagens de retorno para o usuário são pouco detalhadas, dificultando a compreensão imediata sobre as ações realizadas ou as falhas. Além disso, as listagens de grupos administrados são simples, não oferecendo filtros avançados, o que pode dificultar a busca à medida que o volume de grupos aumentar.
-
-Para solucionar os problemas e aprimorar a aplicação, iremos implementar um mecanismo de bloqueio temporário após um número definido de tentativas incorretas de login para diminuir os riscos de acesso e reformularemos o fluxo de troca de senha para que exija, obrigatoriamente, uma confirmação via e-mail ou outro método de segurança. Já para melhorar a experiência do usuário, revisaremos todas as mensagens de retorno para que se tornem mais informativas, garantindo que elas apresentem confirmações mais claras e visuais.
+| **Caso de Teste** 	| **CT01 – Cadastrar perfil** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	|  |
+| Pontos a Melhorar |  |
