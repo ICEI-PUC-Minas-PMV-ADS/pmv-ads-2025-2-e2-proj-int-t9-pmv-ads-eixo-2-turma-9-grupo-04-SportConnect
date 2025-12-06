@@ -56,5 +56,20 @@
 
 | **Caso de Teste** 	| **CT01 – Cadastrar perfil** 	|
 |:---:	|:---:	|
-|	Pontos Fortes 	|  |
-| Pontos a Melhorar |  |
+|	Pontos Fortes 	| As informação descritas pelo usuário são cadastradas com sucesso |
+| Pontos a Melhorar | No momento do cadastro não há um aviso de que o cadastro foi realizado com sucesso |
+
+| **Caso de Teste** 	| **CT02 – Realizar login** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| A sessão do usuário é estabelecida sem falhas  |
+| Pontos a Melhorar | Não foi encontrado |
+
+| **Caso de Teste** 	| **CT03 – Criar grupos** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| O grupo é cadastrado no sistema com sucesso |
+| Pontos a Melhorar | Não há feedbacks por parte da aplicação informando a criação do grupo |
+
+| **Caso de Teste** 	| **CT04 – Pesquisar grupos** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| A filtragem dos grupos ocorre normalmente mediante as informações inseridas |
+| Pontos a Melhorar | Não foi encontrado |
