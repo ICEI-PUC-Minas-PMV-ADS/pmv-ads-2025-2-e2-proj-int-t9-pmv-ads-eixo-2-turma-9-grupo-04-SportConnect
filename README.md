@@ -23,13 +23,13 @@ O projeto consiste no desenvolvimento de um sistema com o propósito de conectar
 ## Instruções de Instalação, Execução e Acesso
 
 **Acesso rápido (produção)**
-* URL da aplicação: https://seu-dominio.com/caminho
-* Status: online / instável / em manutenção (atualize conforme o caso)
-* Ambiente: produção / homologação
+* URL da aplicação: https://sportconnect11.com.br
+* Status: online
+* Ambiente: produção
 
 **Usuário(s) de teste (se houver):**
-* Login: usuario_teste
-* Senha: senha_teste
+* Login: teste@gmail.com
+* Senha: 123
 
 # Documentação
 
