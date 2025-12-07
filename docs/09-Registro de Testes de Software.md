@@ -73,3 +73,28 @@
 |:---:	|:---:	|
 |	Pontos Fortes 	| A filtragem dos grupos ocorre normalmente mediante as informações inseridas |
 | Pontos a Melhorar | Não foi encontrado |
+
+| **Caso de Teste** 	| **CT05 – Sair do Grupo** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| É possível que o usuário saia do grupo quando ele bem entender. |
+| Pontos a Melhorar | Ter um período para o usuário retornar ao grupo em que ele acaba de sair, de forma que ele tenha que esperar um tempo para se reingressar na quele mesmo grupo no qual ele saiu. |
+
+| **Caso de Teste** 	| **CT06 – Receber Notificações** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| O usuário recebe notificações referente a sua entrada em um grupo |
+| Pontos a Melhorar | O usuário receber notificações ao ser criado um evento no grupo em que ele participa. |
+
+| **Caso de Teste** 	| **CT07 – Consultar Grupo** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| O usuário consegue consultar todos os grupos no qual ele participa e ou admnistra. |
+| Pontos a Melhorar | Não foi encontrado. |
+
+| **Caso de Teste** 	| **CT08 – Lista de Espera** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| A lista de espera funciona como um fila de forma automatíca.  |
+| Pontos a Melhorar | O Administrador daquele grupo não tem conhecimento de quantos estão na fila de espera. |
+
+| **Caso de Teste** 	| **CT09 – PDF Com os Participantes** 	|
+|:---:	|:---:	|
+|	Pontos Fortes 	| É gerado um PDF com todos os participantes do grupo no qual aquele admnistrador gere. |
+| Pontos a Melhorar | Não foi encontrado |
